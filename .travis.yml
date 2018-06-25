@@ -1,6 +1,7 @@
 language: c
 os:
 - linux
+- osx
 git:
   depth: 1
 
