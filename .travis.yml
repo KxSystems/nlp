@@ -27,6 +27,7 @@ install:
   - if [[ "x$QLIC_KC" != "x" ]]; then
       echo -n $QLIC_KC |base64 --decode > q/kc.lic;
       pip -q install -r requirements.txt;
+      python -m spacy download en;
     fi
 script:
 - echo "Preparing version $TRAVIS_BRANCH-$TRAVIS_COMMIT"
