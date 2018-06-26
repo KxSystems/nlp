@@ -58,7 +58,11 @@ all(()~findDates"";()~findDates"not a date";()~findDates"Oct 33rd 2001";()~findD
 /checks ranges- are changed now ()~findDates "2291"
 ()~findDates"1700"
 ()~findDates"2291"
-/$[.z.K<3.6;();1700.01.01 1700.01.31]~first(.nlp.findDates "Jan 1700")[;0 1]
+(first(findDates "Jan 1700")[;0 1])~($[.z.K<3.6;();1700.01.01 1700.01.31])
+(first(findDates "Jan 2291")[;0 1])~($[.z.K<3.6;();2291.01.01 2291.01.31])
+(first(findDates "Jan 1st 1700")[;0 1])~($[.z.K<3.6;();1700.01.01 1700.01.01])
+(first(findDates "Jan 1st 2291")[;0 1])~($[.z.K<3.6;();2291.01.01 2291.01.01])
+
 /$[.z.K<3.6;();2290.01.01 2290.01.31]~first(.nlp.findDates "Jan 2290")[;0 1]
 /$[.z.K<3.6;();1700.01.01 17000.01.01]~first(.nlp.findDates"Jan 1st 1700")[;0 1]
 /$[.z.K<3.6;();2290.01.01 2290.01.01]~first(.nlp.findDates "Jan 1st 2290")[;0 1]
