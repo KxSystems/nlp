@@ -58,10 +58,10 @@ all(()~findDates"";()~findDates"not a date";()~findDates"Oct 33rd 2001";()~findD
 /checks ranges- are changed now ()~findDates "2291"
 ()~findDates"1700"
 ()~findDates"2291"
-()~findDates "Jan 1700"
-()~findDates "Jan 2290"
-()~findDates"Jan 1st 1700"
-()~findDates "Jan 1st 2290"
+0N!findDates "Jan 1700"
+0N!findDates "Jan 2290"
+0N!findDates"Jan 1st 1700"
+0N!findDates "Jan 1st 2290"
 all(2001.02.01 2001.02.28~first(findDates"Feb 2001")[;0 1];2004.02.01 2004.02.29~first(findDates"Feb 2004")[;0 1];2004.12.01 2004.12.31~first(findDates"Dec 2004")[;0 1];2004.12.01 2004.12.31~first(findDates"2004 Dec")[;0 1])
 
 all((2#2001.02.11)~first(findDates"Feb 11 2001")[;0 1];(2#2001.02.11)~first(findDates"Feb 2001 11")[;0 1];(2#2001.02.11)~first(findDates"11 Feb 2001")[;0 1];(2#2001.02.11)~first(findDates"11 2001 Feb")[;0 1];(2#2001.02.11)~first(findDates"2001 Feb 11")[;0 1];(2#2001.02.11)~first(findDates"2001 11 Feb")[;0 1];(2#2001.02.11)~first(findDates"Feb 11th 01")[;0 1];(2#2001.02.11)~first(findDates"Feb 01 11th")[;0 1];(2#2001.02.11)~first(findDates"11th Feb 01")[;0 1];(2#2001.02.11)~first(findDates"11th 01 Feb")[;0 1];(2#2001.02.11)~first(findDates"01 Feb 11th")[;0 1];(2#2001.02.11)~first(findDates"01 11th Feb")[;0 1];(2#2001.10.11)~first(findDates"10 11th 2001")[;0 1];(2#2001.10.11)~first(findDates"10 2001 11th")[;0 1];(2#2001.10.11)~first(findDates"11th 10 2001")[;0 1];(2#2001.10.11)~first(findDates"11th 2001 10")[;0 1];(2#2001.10.11)~first(findDates"2001 10 11th")[;0 1];(2#2001.10.11)~first(findDates"2001 11th 10")[;0 1])
