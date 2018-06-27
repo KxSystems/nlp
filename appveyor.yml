@@ -1,0 +1,36 @@
+version: 1.0.{build}
+image:
+- Visual Studio 2017
+clone_depth: 1
+
+skip_non_tags: false
+platform: x64
+
+build_script:
+- cmd: >-
+     set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
+     conda install -c kx embedpy
+     if not defined QLIC_KC (
+        goto :nokdb
+        )
+     pip install -r requirements.txt || goto :error
+     python -m spacy download en || goto :error
+     exit /b 0
+  
+     :error
+     echo fail with error %errorLevel%
+     exit /b %errorLevel%
+
+     :nokdb
+     echo no kdb
+     exit /b 0
+
+after_build:
+- cmd: >-
+    
+deploy:
+ release: $(appveyor_repo_tag_name)
+ provider: GitHub
+ auth_token: $(GITHUB_APIKEY)
+ on:
+  appveyor_repo_tag: true
