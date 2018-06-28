@@ -18,7 +18,7 @@ build_script:
 
     conda info -a
 
-    conda install -c kx embedpy
+    conda install -c kx kdb
 
     conda info --base
 
