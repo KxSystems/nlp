@@ -10,7 +10,7 @@ platform: x64
 
 build_script:
 - cmd: >-
-    start /wait "" Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%UserProfile%\Miniconda3
+    start /wait "" Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /D=%UserProfile%\Miniconda3
     set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
 deploy:
  release: $(appveyor_repo_tag_name)
