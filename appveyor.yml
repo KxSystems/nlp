@@ -3,36 +3,12 @@ image:
 - Visual Studio 2015
 clone_depth: 1
 
-artifacts:
-- path: jupyterq_windows-$(appveyor_repo_tag_name).zip
 skip_non_tags: false
 platform: x64
 
 build_script:
 - cmd: >-
-    set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
-
-    curl -fsSOJL %W64% 
-    
-    mkdir q
-    
-    7z x w64.zip -oq
-   
-    echo|set /P =%QLIC_KC% >q\kc.lic.enc
-
-    certutil -decode q\kc.lic.enc q\kc.lic
-
-    set QHOME=%cd%\q
-
-    set PATH=%QHOME%\w64;%PATH%
-
-    echo .z.K | q -q
-
-    mkdir embedpy
-
-    cd embedpy
-    
-    echo getembedpy"latest" | q ..\build\getembedpy.q -q || goto :error
+    build\buildscript.bat
 
     pip install requirements.txt
 
