@@ -10,9 +10,15 @@ platform: x64
 
 build_script:
 - cmd: >-
-    start /wait "" Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /D=%UserProfile%\Miniconda3
     set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
+    #installing embedPy with conda
+    conda config --set always_yes yes --set changeps1 no
+    conda update -q conda
+    conda info -a
+    conda install -c kx embedpy
+    conda info --base
 deploy:
+
  release: $(appveyor_repo_tag_name)
  provider: GitHub
  auth_token: $(GITHUB_APIKEY)
