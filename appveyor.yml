@@ -20,13 +20,13 @@ build_script:
     #setting q home 
     mkdir q
     copy %(conda info --base)%/q C:\q
-    echo|set /P =%QLIC_KC% >q\kc.lic.enc
-    certutil -decode q\kc.lic.enc q\kc.lic
-    set QHOME=%cd%\q
-    set PATH=%QHOME%\w64;%PATH%
-    if not defined QLIC_KC (
-      goto :nokdb
-     )
+    #echo|set /P =%QLIC_KC% >q\kc.lic.enc
+    #certutil -decode q\kc.lic.enc q\kc.lic
+    #set QHOME=%cd%\q
+    #set PATH=%QHOME%\w64;%PATH%
+    #if not defined QLIC_KC (
+    #  goto :nokdb
+    # )
 deploy:
 
  release: $(appveyor_repo_tag_name)
