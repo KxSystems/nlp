@@ -8,7 +8,7 @@ platform: x64
 
 build_script:
 - cmd: >-
-    build\buildscript.bat
+    builds\buildscript.bat
 
     pip install requirements.txt
 
