@@ -11,8 +11,5 @@ build_script:
 
     build\buildscript.bat
 
-    pip install requirements.txt
+    build\test.bat
 
-    python -m spacy en
-
-    q test.q
