@@ -9,8 +9,6 @@ cd embedpy
 echo getembedpy"latest" | q ..\build\getembedpy.q -q || goto :error
 cd ..
 echo p)print('embedpy runs') | q -q || goto :error
-pip install -r requirements.txt || goto :error
-call "install.bat" || goto :error
 exit /b 0
 
 :error
