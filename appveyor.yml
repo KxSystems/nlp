@@ -17,11 +17,6 @@ build_script:
 
     conda update -q conda
 
-    conda info -a
-
-    conda install -c kx embedpy
-
-    conda info --base
 
 deploy:
 
