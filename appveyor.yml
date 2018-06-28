@@ -11,10 +11,10 @@ build_script:
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe
      set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
      conda install -c kx embedpy
-     if not defined QLIC_KC (
-        goto :nokdb
-        )
-     pip install -r requirements.txt || goto :error
+
+
+
+
      python -m spacy download en || goto :error
      exit /b 0
   
