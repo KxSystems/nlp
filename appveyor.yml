@@ -20,6 +20,7 @@ build_script:
     #setting q home 
     mkdir q
     copy %(conda info --base)%/q C:\q
+    certutil -decode q\kc.lic.enc q\kc.lic
 deploy:
 
  release: $(appveyor_repo_tag_name)
