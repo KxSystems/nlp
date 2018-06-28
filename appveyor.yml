@@ -1,36 +1,22 @@
 version: 1.0.{build}
 image:
-- Visual Studio 2015
+- Visual Studio 2017
 clone_depth: 1
 
+artifacts:
+- path: jupyterq_windows-$(appveyor_repo_tag_name).zip
 skip_non_tags: false
 platform: x64
 
 build_script:
 - cmd: >-
-
-
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe
-     
-      set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
-     
-      conda install -c kx embedpy
-     
-      python -m spacy download en || goto :error
-     
-      exit /b 0
-  
-     :error
-     echo fail with error %errorLevel%
-     exit /b %errorLevel%
-
-     :nokdb
-     echo no kdb
-     exit /b 0
+    start /wait "" Miniconda3-latest-Windows-x86_64.exe /InstallationType=JustMe /RegisterPython=0 /S /D=%UserProfile%\Miniconda3
+    set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
+    conda install -c kx embedpy
 
 after_build:
 - cmd: >-
-    
+    build\package.bat
 deploy:
  release: $(appveyor_repo_tag_name)
  provider: GitHub
