@@ -8,15 +8,17 @@ platform: x64
 
 build_script:
 - cmd: >-
+
+
       wget https://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe
-     set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
-     conda install -c kx embedpy
-
-
-
-
-     python -m spacy download en || goto :error
-     exit /b 0
+     
+      set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
+     
+      conda install -c kx embedpy
+     
+      python -m spacy download en || goto :error
+     
+      exit /b 0
   
      :error
      echo fail with error %errorLevel%
