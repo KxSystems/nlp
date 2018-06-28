@@ -12,20 +12,30 @@ build_script:
 - cmd: >-
     set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
 
-    conda config --set always_yes yes --set changeps1 no
+    curl -fsSOJL %W64% 
+    
+    mkdir q
+    
+    7z x w64.zip -oq
+   
+    echo|set /P =%QLIC_KC% >q\kc.lic.enc
 
-    conda update -q conda
+    certutil -decode q\kc.lic.enc q\kc.lic
 
-    conda info -a
+    set QHOME=%cd%\q
 
-    conda install -c kx kdb
+    set PATH=%QHOME%\w64;%PATH%
 
-    conda info --base
+    echo .z.K | q -q
 
-deploy:
+    mkdir embedpy
 
- release: $(appveyor_repo_tag_name)
- provider: GitHub
- auth_token: $(GITHUB_APIKEY)
- on:
-  appveyor_repo_tag: true
+    cd embedpy
+    
+    echo getembedpy"latest" | q ..\build\getembedpy.q -q || goto :error
+
+    pip install requirements.txt
+
+    python -m spacy en
+
+    q test.q
