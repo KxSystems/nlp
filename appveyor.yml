@@ -12,7 +12,6 @@ build_script:
 - cmd: >-
     set PATH=C:\Miniconda3-x64;C:\Miniconda3-x64\Scripts;%PATH%
 
-    #installing embedPy with conda
     conda config --set always_yes yes --set changeps1 no
 
     conda update -q conda
