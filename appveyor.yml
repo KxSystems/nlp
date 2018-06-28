@@ -23,17 +23,6 @@ build_script:
 
     conda info --base
 
-    #setting q home 
-
-    mkdir q
-
-    copy %(conda info --base)%/q C:\q
-
-    echo|set /P =%QLIC_KC% >C:\q\kc.lic.enc
-
-    cd q
-
-    dir 
 deploy:
 
  release: $(appveyor_repo_tag_name)
