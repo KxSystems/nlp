@@ -14,8 +14,8 @@ cd ..
 exit /b 0
 
 :error
-echo failed with error %errorLevel%
-exit /b %errorLevel%
+echo failed with error 
+exit /b 
 
 :nokdb
 echo no kdb
