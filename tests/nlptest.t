@@ -17,7 +17,6 @@ enlist[(`u#`$())!()]~TFIDF([]tokens:enlist `$(); isStop:enlist `boolean$());
 keywords:TFIDF enlist corpus 1;
 all(98h~type keywords;all 0f = value first keywords)
 
-
 /compareDocs
 p:newParser[`en; enlist`keywords];
 corpus:p text;
@@ -51,21 +50,16 @@ all 1<value extractPhrases[corpus;`enron]
 phrases:(!) . flip ((`notre`dame`executive`education;7);(`chief`executive`reuters;7);(`sandy`leitch`chief`executive`zurich;7));
 phrases~(key phrases)#extractPhrases[corpus;`executive]
 all(extractPhrases[p enlist "hydrogren"; `helium] ~ ()!();extractPhrases[p enlist "helium"; `helium] ~()!())
-        
 
 /findDates
 all(()~findDates"";()~findDates"not a date";()~findDates"Oct 33rd 2001";()~findDates"Feb 29st 2001")
 /checks ranges- are changed now ()~findDates "2291"
 ()~findDates"1700"
 ()~findDates"2291"
-(first(findDates "Jan 1700")[;0 1])~($[.z.K<3.6;();1700.01.01 1700.01.31])
-(first(findDates "Jan 2291")[;0 1])~($[.z.K<3.6;();2291.01.01 2291.01.31])
-(first(findDates "Jan 1st 1700")[;0 1])~($[.z.K<3.6;();1700.01.01 1700.01.01])
-(first(findDates "Jan 1st 2291")[;0 1])~($[.z.K<3.6;();2291.01.01 2291.01.01])
-
-/$[.z.K<3.6;();2290.01.01 2290.01.31]~first(.nlp.findDates "Jan 2290")[;0 1]
-/$[.z.K<3.6;();1700.01.01 17000.01.01]~first(.nlp.findDates"Jan 1st 1700")[;0 1]
-/$[.z.K<3.6;();2290.01.01 2290.01.01]~first(.nlp.findDates "Jan 1st 2290")[;0 1]
+(first(findDates "Jan 1800")[;0 1])~1800.01.01 1800.01.31
+(first(findDates "Jan 2281")[;0 1])~2281.01.01 2281.01.31
+(first(findDates "Jan 1st 1800")[;0 1])~1800.01.01 1800.01.01
+(first(findDates "Jan 1st 2281")[;0 1])~2281.01.01 2281.01.01
 all(2001.02.01 2001.02.28~first(findDates"Feb 2001")[;0 1];2004.02.01 2004.02.29~first(findDates"Feb 2004")[;0 1];2004.12.01 2004.12.31~first(findDates"Dec 2004")[;0 1];2004.12.01 2004.12.31~first(findDates"2004 Dec")[;0 1])
 
 all((2#2001.02.11)~first(findDates"Feb 11 2001")[;0 1];(2#2001.02.11)~first(findDates"Feb 2001 11")[;0 1];(2#2001.02.11)~first(findDates"11 Feb 2001")[;0 1];(2#2001.02.11)~first(findDates"11 2001 Feb")[;0 1];(2#2001.02.11)~first(findDates"2001 Feb 11")[;0 1];(2#2001.02.11)~first(findDates"2001 11 Feb")[;0 1];(2#2001.02.11)~first(findDates"Feb 11th 01")[;0 1];(2#2001.02.11)~first(findDates"Feb 01 11th")[;0 1];(2#2001.02.11)~first(findDates"11th Feb 01")[;0 1];(2#2001.02.11)~first(findDates"11th 01 Feb")[;0 1];(2#2001.02.11)~first(findDates"01 Feb 11th")[;0 1];(2#2001.02.11)~first(findDates"01 11th Feb")[;0 1];(2#2001.10.11)~first(findDates"10 11th 2001")[;0 1];(2#2001.10.11)~first(findDates"10 2001 11th")[;0 1];(2#2001.10.11)~first(findDates"11th 10 2001")[;0 1];(2#2001.10.11)~first(findDates"11th 2001 10")[;0 1];(2#2001.10.11)~first(findDates"2001 10 11th")[;0 1];(2#2001.10.11)~first(findDates"2001 11th 10")[;0 1])
@@ -76,7 +70,6 @@ all((2#1999.02.01)~first(findDates"01/02/1999")[;0 1];(2#1999.02.01)~first(findD
 (2#2001.02.03)~first(findDates"03/02/01")[;0 1]
 all((2#2035.02.03)~first(findDates"35 3 Feb")[;0 1];(2#2010.02.03)~first(findDates"10 3 Feb")[;0 1];(2#1987.02.03)~first(findDates"87 3rd Feb.")[;0 1];(2#1936.02.03)~first(findDates"36 3rd Feb.")[;0 1])        
 all((2#2001.02.03)~first(findDates"3rd. Feb/2001")[;0 1];(2#2001.02.03)~first(findDates"3-Feb.- 2001")[;0 1])
-    
 all((2#1965.01.02)~first(findDates"65/01/02")[;0 1];(2#1965.01.02)~first(findDates"02/01/65")[;0 1];(2#2011.12.13)~first(findDates"13/12/11")[;0 1];(2#2013.12.11)~first(findDates"11/12/13")[;0 1])
 all(()~findDates"65/13/02";()~findDates"12/13/12")
       
@@ -140,7 +133,6 @@ emails:.nlp.loadEmails["data/test.mbox"]
 (last .nlp.loadEmails["data/test.mbox"]`text)~"Your email client does not support HTML mails."
 ("multipart/alternative";"multipart/alternative";"multipart/alternative";"multipart/alternative";"multipart/alternative";"multipart/alternative";"text/html";"multipart/alternative";"multipart/alternative")~emails`contentType
 
-
 /parseURL
 parseURLs["http://www.google.com"]~`scheme`domainName`path`parameters`query`fragment!("http";"www.google.com";"";"";"";"")
 parseURLs["ssh://samsquanch@mx4.hotmail.com"][`scheme`domainName]~("ssh";"samsquanch@mx4.hotmail.com")
@@ -148,8 +140,6 @@ parseURLs["https://www.google.ca:1234/test/index.html;myParam?foo=bar&quux=blort
 all(parseURLs["google.ca/test/index.html"][`scheme`domainName`path]~("http";"google.ca";"/test/index.html");parseURLs["www.google.co.uk"][`scheme`domainName`path]~("http";"www.google.co.uk";""))
 parseURLs["https://网站.中国.com"]~`scheme`domainName`path`parameters`query`fragment!("https";"网站.中国.com";"";"";"";"")
 (parseURLs each ("https://travel.gc.ca/";"https://www.canada.ca/en/revenue-agency.html"))~([]scheme:("https"; "https");domainName:("travel.gc.ca"; "www.canada.ca");path:(enlist "/";"/en/revenue-agency.html");parameters: (""; "");query:(""; "");fragment:(""; ""))
-
-
 \d .
 
 /compareCorpora
