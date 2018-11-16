@@ -40,7 +40,9 @@ parser.i.q2spacy:(!). flip(
 parser.i.newParser:{[lang;opts]
   opts:distinct opts,raze parser.i.depOpts colnames:opts;
   disabled:`ner`tagger`parser except opts;
-  model:.p.import[`spacy;`:load][lang;`disable pykw disabled];
+  model: $[lang ~ `zh;
+    .p.import[`spacy.lang.zh][`:Chinese][`disable pykw disabled];
+    .p.import[`spacy;`:load][lang;`disable pykw disabled]];
   if[(`sbd in opts)&`parser in disabled;model[`:add_pipe]model[`:create_pipe;`sbd]];
   tokenAttrs:parser.i.q2spacy key[parser.i.q2spacy]inter opts;
   pyParser:parser.i.parseText[model;tokenAttrs;opts;];
