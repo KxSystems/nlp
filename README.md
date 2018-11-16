@@ -31,6 +31,8 @@ conda install --file requirements.txt
 ```
 
 * Download the English model using ```python -m spacy download en```
+
+To tokenize Chinese, [jieba](https://github.com/fxsjy/jieba) must be installed
    
 ## Installation
 Run tests with
