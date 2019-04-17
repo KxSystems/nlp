@@ -77,9 +77,8 @@ parser.i.newSubParser:{[lang;opts;disabled]
  chklng:parser.i.alphalang lang;
  model:.p.import[$[`~chklng;`spacy;sv[`]`spacy.lang,lang]][hsym$[`~chklng;`load;chklng]
    ]. raze[$[`~chklng;lang;()];`disable pykw disabled];
-  if[`sbd in opts;model[`:add_pipe]$[`~chklng;model[`:create_pipe;`sentencizer];.p.pyget `x_sbd]];
   if[`spell in opts;sphun:.p.import[`spacy_hunspell]`:spaCyHunSpell;hunspell:sphun[model;`linux];model[`:add_pipe]hunspell];  
- model}
+  model}
 
 // Operations that must be done in q, or give better performance in q
 parser.i.runParser:{[pyParser;colnames;opts;stopwords;docs]
