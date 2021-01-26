@@ -20,6 +20,18 @@ email.getMboxText:{[filepath]
   update text:.nlp.email.i.extractText each payload from parseMbox
   }
 
+// @kind function
+// @category nlpEmail
+// @fileoverview Get the graph of who emailed who, including the number of 
+//   times they emailed
+// @param emails {tab} The result of .nlp.loadEmails
+// @returns {tab} Defines to-from pairings of emails
+email.getGraph:{[emails]
+  getToFrom:flip`$raze email.i.getToFrom each emails;
+  getToFromTab:flip`sender`to!getToFrom;
+  0!`volume xdesc select volume:count i by sender,to from getToFromTab
+  }
+
 // @private
 // @kind function
 // @category nlpEmailUtility
@@ -70,18 +82,6 @@ email.i.extractText:{[msg]
   "\n\n"sv text
   }
 
-// @kind function
-// @category nlpEmail
-// @fileoverview Get the graph of who emailed who, including the number of 
-//   times they emailed
-// @param emails {tab} The result of .nlp.loadEmails
-// @returns {tab} Defines to-from pairings of emails
-email.getGraph:{[emails]
-  getToFrom:flip`$raze email.i.getToFrom each emails;
-  getToFromTab:flip`sender`to!getToFrom;
-  0!`volume xdesc select volume:count i by sender,to from getToFromTab
-  }
-
 // @private
 // @kind function
 // @category nlpEmailUtility
@@ -109,7 +109,7 @@ email.get.i.sender:{[msg]
 // @private
 // @kind function
 // @category nlpEmailUtility
-// @fileoverview Extract the reciever information from an email
+// @fileoverview Extract the receiver information from an email
 // @param msg {<} The email as an embedPy object
 // @returns {str[]} Reciever name and email
 email.get.i.to:{[msg]
@@ -177,6 +177,10 @@ email.get.i.payload:{[msg]
   `attachment`content!(0b;content)
   }
 
+
+// @private
+// @kind function
+// @category nlpEmailUtility
 // @fileoverview Get meta information from an email 
 // @params filepath {str} The path to where the email is stored
 // @returns {dict} Meta information from the email
@@ -184,6 +188,9 @@ email.i.parseMail:{[filepath]
   email.i.parseMbox1 email.i.msgFromString[filepath]`.
   }
 
+// @private
+// @kind function
+// @category nlpEmailUtility
 // @fileoverview Get meta information from an email 
 // @params filepath {str} The path to the mbox
 // @returns {dict} Meta information from the email
@@ -192,6 +199,9 @@ email.i.parseMbox:{[filepath]
   email.i.parseMbox1 each .p.list[<] mbox
   }
 
+// @private
+// @kind function
+// @category nlpEmailUtility
 // @fileoverview Get meta information from an email 
 // @params mbox {<} Emails in mbox format
 // @returns {dict} Meta information from the email
