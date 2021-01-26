@@ -31,12 +31,12 @@ cluster.MSE:{[docs]
   // it just reflects its similarity to itself
   dists:0^compareDocToCentroid[centroid]each docs;
   avg dists*dists
- }
+  }
 
 // @kind function
 // @category nlpClustering
 // @fileoverview The bisecting k-means algorithm which uses k-means to 
-//  repeatedly split the most cohesive clusters into two clusters
+//   repeatedly split the most cohesive clusters into two clusters
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param k {long} The number of clusters to return
 // @param iters {long} The number of times to iterate the refining step
@@ -51,7 +51,7 @@ cluster.bisectingKMeans:{[docs;k;iters]
 // @kind function
 // @category nlpClusteringUtility
 // @fileoverview The bisecting k-means algorithm which uses k-means to 
-//  repeatedly split the most cohesive clusters into two clusters
+//   repeatedly split the most cohesive clusters into two clusters
 // @param iters {long} The number of times to iterate the refining step
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param clusters {long} Cluster indices
@@ -94,10 +94,10 @@ cluster.i.kmeans:{[docs;clusters]
 // @param centroids {dict[]} Centroids as keyword dictionaries
 // @param docs {dict[]} A list of document feature vectors
 // @returns {long[][]} Lists of document indices where each list is a cluster
-//  N.B. These don't line up with the number of centroids passed in,
-//  and the number of lists returned may not equal the number of centroids.
-//  There can be documents which match no centroids (all of which will end up 
-//  in the same group), and centroids with no matching documents.
+//   N.B. These don't line up with the number of centroids passed in,
+//   and the number of lists returned may not equal the number of centroids.
+//   There can be documents which match no centroids (all of which will end up 
+//   in the same group), and centroids with no matching documents.
 cluster.groupByCentroids:{[centroids;docs]
   // If there are no centroids, everything is in one group
   if[not count centroids;:enlist til count docs];
@@ -159,7 +159,7 @@ cluster.i.similarClusters:{[clusters;counts;idx]
 // @kind function
 // @category nlpClustering
 // @fileoverview An extremely fast clustering algorithm for very large datasets
-//  Produces small but cohesive clusters.
+//   Produces small but cohesive clusters.
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param numOfClusters {long} The number of clusters desired, though fewer 
 //   may be returned.
@@ -188,13 +188,13 @@ cluster.radix:{[docs;n]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview An extremely fast clustering algorithm for very large datasets.
-//  Produces small but cohesive clusters.
+// @fileoverview An extremely fast clustering algorithm for very large datasets
+//   Produces small but cohesive clusters.
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param numOfClusters {long} The number of clusters desired, though fewer may
-//  be returned.
-//  This must be fairly high to cover a substantial amount of the corpus, as 
-//  clusters are small
+//   be returned.
+//   This must be fairly high to cover a substantial amount of the corpus, as 
+//   clusters are small
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.fastRadix:{[docs;n]
   docs:cluster.i.asKeywords docs;
