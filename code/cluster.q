@@ -144,7 +144,7 @@ cluster.i.mergeOverlappingClusters:{[clusters]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// fileoverview Group together clusters that share over 50% of their elements
+// @fileoverview Group together clusters that share over 50% of their elements
 // @param clusters {any[][]} Cluster indices
 // @param counts {long} Count of each cluster
 // @param idx {long} Index of cluster
