@@ -11,8 +11,7 @@ i.striprtf:.p.get[`striprtf;<]
 
 // @kind function
 // @category nlpEmail
-// @fileoverview Read an mbox file, converting it to a table with the parsed 
-//   metadata and the content as plain-text
+// @fileoverview Convert an MBOX file to a table of parsed metadata
 // @param filepath {str} The path to the mbox
 // @returns {tab} Parsed metadata and content from the mbox
 email.getMboxText:{[filepath]
@@ -37,7 +36,7 @@ email.getGraph:{[emails]
 // @category nlpEmailUtility
 // @fileoverview Extract information from various message text types
 // @params textTyp {str} The format of the message text 
-// @param msg {str;dict} An email, or email subtree
+// @param msg {str;dict} An email message, or email subtree
 // @returns {bool} Whether or not msg fits the text type criteria 
 email.i.findMime:{[textTyp;msg]
   msgDict:99=type each msg`payload;
@@ -60,7 +59,7 @@ email.i.html2text:{[msg]
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Given an email, extract the text of the email
-// @param msg {str;dict} An email, or email subtree
+// @param msg {str;dict} An email message, or email subtree
 // @returns {str} The text of the email, or email subtree
 email.i.extractText:{[msg]
   // String is actual text, bytes attachment or non text mime type like inline 
@@ -99,10 +98,10 @@ email.i.getToFrom:{[msg]
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Extract the sender information from an email
-// @param msg {<} The email as an embedPy object
+// @param emails {<} The email as an embedPy object
 // @returns {str[]} Sender name and email
-email.get.i.sender:{[msg]
-  fromInfo:raze msg[`:get_all;<]each("from";"resent-from");
+email.get.i.sender:{[emails]
+  fromInfo:raze emails[`:get_all;<]each("from";"resent-from");
   email.i.getAddr fromInfo where not(::)~'fromInfo
   }
 
@@ -110,10 +109,10 @@ email.get.i.sender:{[msg]
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Extract the receiver information from an email
-// @param msg {<} The email as an embedPy object
+// @param emails {<} The email as an embedPy object
 // @returns {str[]} Reciever name and email
-email.get.i.to:{[msg]
-  toInfo:raze msg[`:get_all;<]each("to";"cc";"resent-to";"resent-cc");
+email.get.i.to:{[emails]
+  toInfo:raze emails[`:get_all;<]each("to";"cc";"resent-to";"resent-cc");
   email.i.getAddr toInfo where not any(::;"")~/:\:toInfo
   }
 
@@ -121,10 +120,10 @@ email.get.i.to:{[msg]
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Extract the date information from an email
-// @param msg {<} The email as an embedPy object
+// @param emails {<} The email as an embedPy object
 // @returns {timestamp} Date email was sent
-email.get.i.date:{[msg]
-  dates:string 6#email.i.parseDate msg[@;`date];
+email.get.i.date:{[emails]
+  dates:string 6#email.i.parseDate emails[@;`date];
   "P"$"D"sv".:"sv'3 cut{$[1=count x;"0";""],x}each dates
   }
  
@@ -132,10 +131,10 @@ email.get.i.date:{[msg]
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Extract the subject information from an email
-// @param msg {<} The email as an embedPy object
+// @param emails {<} The email as an embedPy object
 // @returns {str} Subject of the email
-email.get.i.subject:{[msg]
-  subject:msg[@;`subject];
+email.get.i.subject:{[emails]
+  subject:emails[@;`subject];
   $[(::)~subject`;
     "";
     email.i.makeHdr[email.i.decodeHdr subject][`:__str__][]`
@@ -146,42 +145,41 @@ email.get.i.subject:{[msg]
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Extract the content type of an email
-// @param msg {<} The email as an embedPy object
+// @param emails {<} The email as an embedPy object
 // @returns {str} Content type of an email 
-email.get.i.contentType:{[msg]
-  msg[`:get_content_type][]`
+email.get.i.contentType:{[emails]
+  emails[`:get_content_type][]`
   }
 
 // @private
 // @kind function
 // @category nlpEmailUtility
 // @fileoverview Extract the payload information from an email
-// @param msg {<} The email as an embedPy object
+// @param emails {<} The email as an embedPy object
 // @returns {dict;tab} Dictionary of `attachment`content or a table of payloads
 //   Content is byte[] for binary data, char[] for text
-email.get.i.payload:{[msg]
-  if[msg[`:is_multipart][]`;:email.i.parseMbox1 each msg[`:get_payload][]`];
+email.get.i.payload:{[emails]
+  if[emails[`:is_multipart][]`;:email.i.parseMbox1 each emails[`:get_payload][]`];
   // Raw bytes decoded from base64 encoding, wrapped embedPy
-  raw:msg[`:get_payload;`decode pykw 1]; 
-  rtf:"application/rtf"~email.get.i.contentType msg;
-  attachment:"attachment"~msg[`:get_content_disposition][]`;
+  raw:emails[`:get_payload;`decode pykw 1]; 
+  rtf:"application/rtf"~email.get.i.contentType emails;
+  attachment:"attachment"~emails[`:get_content_disposition][]`;
   payload:`attachment`content!(0b;raw`);
   if[all(rtf;attachment);:payload];
   if[attachment;
     payload,`attachment`filename!(1b;email[`:get_filename][]`);
     ];
-  content:email.get.i.contentType msg;
+  content:email.get.i.contentType emails;
   if[not any content~/:("text/html";"text/plain";"message/rfc822");:payload];
-  charset:msg[`:get_content_charset][]`;
+  charset:emails[`:get_content_charset][]`;
   content:i.str[raw;$[(::)~charset;"us-ascii";charset];"ignore"]`;
   `attachment`content!(0b;content)
   }
 
-
 // @private
 // @kind function
 // @category nlpEmailUtility
-// @fileoverview Get meta information from an email 
+// @fileoverview Extract meta information from an email 
 // @params filepath {str} The path to where the email is stored
 // @returns {dict} Meta information from the email
 email.i.parseMail:{[filepath]
@@ -191,7 +189,7 @@ email.i.parseMail:{[filepath]
 // @private
 // @kind function
 // @category nlpEmailUtility
-// @fileoverview Get meta information from an email 
+// @fileoverview Extract meta information from an email 
 // @params filepath {str} The path to the mbox
 // @returns {dict} Meta information from the email
 email.i.parseMbox:{[filepath]
@@ -202,7 +200,7 @@ email.i.parseMbox:{[filepath]
 // @private
 // @kind function
 // @category nlpEmailUtility
-// @fileoverview Get meta information from an email 
+// @fileoverview Extract meta information from an email 
 // @params mbox {<} Emails in mbox format
 // @returns {dict} Meta information from the email
 email.i.parseMbox1:{[mbox]
