@@ -1,5 +1,9 @@
 \d .nlp
 
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Pytho spell check function
 p)def spell(doc,model):
   lst=[]
   for s in doc:
@@ -12,7 +16,10 @@ p)def spell(doc,model):
         lst.append(s)
   return lst
 
-// Python functions for running spacy
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Python function for running spacy
 p)def get_doc_info(parser,tokenAttrs,opts,text):
   doc=doc1=parser(text)
   if('spell' in opts):
@@ -24,8 +31,11 @@ p)def get_doc_info(parser,tokenAttrs,opts,text):
     res.append([s.start for s in doc.sents])
   res.append([w.is_punct or w.is_bracket or w.is_space for w in doc])
   return res
-parser.i.parseText:.p.get[`get_doc_info;<];
-parser.i.cleanUTF8:.p.import[`builtins;`:bytes.decode;<][;`errors pykw`ignore]$["x"]@;
+
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Python functions to detect sentence borders
 p)def x_sbd(doc):
   if len(doc):
     doc[0].is_sent_start=True
@@ -33,7 +43,22 @@ p)def x_sbd(doc):
       doc[i+1].is_sent_start=token.text in ['。','？','！']
   return doc
 
-// Dependent options
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Retrieve python function for running spacy
+parser.i.parseText:.p.get[`get_doc_info;<];
+
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Retrieve python function to decode bytes
+parser.i.cleanUTF8:.p.import[`builtins;`:bytes.decode;<][;`errors pykw`ignore]$["x"]@;
+
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Dependent options for input to spacy module
 parser.i.depOpts:(!). flip(
   (`keywords;   `tokens`isStop);
   (`sentChars;  `sentIndices);
@@ -43,7 +68,10 @@ parser.i.depOpts:(!). flip(
   (`lemmas;     `tagger);
   (`isStop;     `lemmas))
 
-// Map from q-style attribute names to spacy
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Map from q-style attribute names to spacy
 parser.i.q2spacy:(!). flip(
   (`likeEmail;  `like_email);
   (`likeNumber; `like_num);
@@ -55,57 +83,97 @@ parser.i.q2spacy:(!). flip(
   (`pennPOS;    `tag_);
   (`starts;     `idx))
 
-// Model inputs for spacy 'alpha' models
+// @private
+// @kind function
+// @category nlpParserUtility
+// @fileoverview Model inputs for spacy 'alpha' models
 parser.i.alphalang:(!). flip(
   (`ja;`Japanese);
   (`zh;`Chinese))
 
-// Create new parser
-// Valid opts : text keywords likeEmail likeNumber likeURL isStop tokens lemmas uniPOS pennPOS starts sentChars sentIndices spell
-parser.newParser:{[lang;opts]
-  opts:{distinct x,raze parser.i.depOpts x}/[colnames:opts];
+// @fileOverview Create a new parser
+// @param modelName {sym} The spaCy model to use. It must already be installed.
+// @param options {sym[]} The fields the parser should return
+// @returns {func} A function to parse text
+parser.newParser:{[modelName;options]
+  opts:{distinct x,raze parser.i.depOpts x}/[options];
   disabled:`ner`tagger`parser except opts;
-  model:parser.i.newSubParser[lang;opts;disabled];
+  model:parser.i.newSubParser[modelName;opts;disabled];
   tokenAttrs:parser.i.q2spacy key[parser.i.q2spacy]inter opts;
   pyParser:parser.i.parseText[model;tokenAttrs;opts;];
-  stopwords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
-  parser.i.runParser[pyParser;colnames;opts;stopwords]}
+  stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
+  parser.i.runParser[pyParser;options;opts;stopWords]
+  }
 
-// Returns a parser for the given language
-parser.i.newSubParser:{[lang;opts;disabled] 
- chklng:parser.i.alphalang lang;
- model:.p.import[$[`~chklng;`spacy;sv[`]`spacy.lang,lang]][hsym$[`~chklng;`load;chklng]
-   ]. raze[$[`~chklng;lang;()];`disable pykw disabled];
-  if[`sbd in opts;model[`:add_pipe]$[`~chklng;model[`:create_pipe;`sentencizer];.p.pyget `x_sbd]];
-  if[`spell in opts;if[not .p.import[`spacy.tokens][`:Token][`:has_extension]["hunspell_spell"]`;
-   sphun:.p.import[`spacy_hunspell]`:spaCyHunSpell;hunspell:sphun[model;
-   $[`Darwin~syst:`$.p.import[`platform][`:system][]`;`mac;lower syst]];model[`:add_pipe]hunspell]];
- model}
+// @fileOverview Create a new parser
+// @param modelName {sym} The spaCy model to use. It must already be installed.
+// @param options {sym[]} The fields the parser should return
+// @param disables {sym[]} The modules to be disabled
+// @returns {func} a parser for the given language
+parser.i.newSubParser:{[modelName;options;disabled] 
+  checkLang:parser.i.alphalang modelName;
+  lang:$[`~checkLang;`spacy;sv[`]`spacy.lang,modelName];
+  model:.p.import[lang][hsym$[`~checkLang;`load;checkLang]];
+  model:model . raze[$[`~checkLang;modelName;()];`disable pykw disabled];
+  if[`sbd in options;
+    pipe:$[`~checkLang;model[`:create_pipe;`sentencizer];.p.pyget`x_sbd];
+    model[`:add_pipe]pipe;
+    ];
+  if[`spell in options;
+    spacyTokens:.p.import[`spacy.tokens][`:Token];
+    if[not spacyTokens[`:has_extension]["hunspell_spell"]`;
+      spHun:.p.import[`spacy_hunspell]`:spaCyHunSpell;
+      platform:`$.p.import[`platform][`:system][]`;
+      osSys:$[`Darwin~platform;`mac;lower platform];
+      hunspell:spHun[model;osSys];
+      model[`:add_pipe]hunspell
+      ]
+    ];
+  model
+  }
 
-// Operations that must be done in q, or give better performance in q
-parser.i.runParser:{[pyParser;colnames;opts;stopwords;docs]
-  t:parser.i.cleanUTF8 each docs;
-  parsed:parser.i.unpack[pyParser;opts;stopwords]each t;
-  if[`keywords in opts;parsed[`keywords]:TFIDF parsed];
-  (($[1=count colnames;enlist;]colnames) except `spell)#@[parsed;`text;:;t]}
+// @fileoverview Operations that must be done in q, or give better performance 
+//   in q
+// @param pyParser {func} A projection to call the spacy parser
+// @param colNames {sym[]} The names to give to the fields returned from spacy
+// @param options {sym[]} The fields to compute
+// @param stopWords {sym[]} The stopWords in the text
+// @param docs {str;str[]} The text being parsed
+// @returns {dict;tab} The parsed document(s)
+parser.i.runParser:{[pyParser;colNames;options;stopWords;docs]
+  tab:parser.i.cleanUTF8 each docs;
+  parsed:parser.i.unpack[pyParser;options;stopWords]each tab;
+  if[`keywords in options;parsed[`keywords]:TFIDF parsed];
+  colNames:($[1=count colNames;enlist;]colNames) except `spell;
+  colNames#@[parsed;`text;:;tab]
+  }
 
-// Operations that must be done in q, or give better performance in q
-parser.i.unpack:{[pyParser;opts;stopwords;text]
-  names:inter[key[parser.i.q2spacy],`sentChars`sentIndices;opts],`isPunct;
+// @fileOverview This handles operations such as casting,or removing punctuation
+//  that need to be done in q, or for performance reasons are better in q
+// @param pyParser {function} A projection to call the spacy parser
+// @param options {symbol[]} The fields to include in the output
+// @param stopWords {sym[]} The stopWords in the text
+// @param text {string} The text being parsed
+// @returns {dictionary} The parsed document
+parser.i.unpack:{[pyParser;options;stopWords;text]
+  names:inter[key[parser.i.q2spacy],`sentChars`sentIndices;options],`isPunct;
   doc:names!pyParser text;
+  // Cast any attributes which should be symbols
   doc:@[doc;names inter`tokens`lemmas`uniPOS`pennPOS;`$];
+  // If there are entities, cast them to symbols
   if[`entities in names;doc:.[doc;(`entities;::;0 1);`$]]
   if[`isStop in names;
     if[`uniPOS  in names;doc[`isStop]|:doc[`uniPOS ]in i.stopUniPOS ];
     if[`pennPOS in names;doc[`isStop]|:doc[`pennPOS]in i.stopPennPOS];
-    if[`lemmas  in names;doc[`isStop]|:doc[`lemmas ]in stopwords];
-  ];
+    if[`lemmas  in names;doc[`isStop]|:doc[`lemmas ]in stopWords];
+    ];
   doc:parser.i.removePunct parser.i.adjustIndices[text]doc;
-  if[`sentIndices in opts;
+  if[`sentIndices in options;
     doc[`sentIndices]@:unique:value last each group doc`sentIndices;
     if[`sentChars in opts;doc[`sentChars]@:unique]
   ];
-  @[doc;`;:;::]}
+  @[doc;`;:;::]
+  }
 
 // Python indexes into strings by char instead of byte, so must be modified to index a q string
 parser.i.adjustIndices:{[text;doc]
