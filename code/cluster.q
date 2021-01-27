@@ -2,11 +2,8 @@
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Clustering algorithms can be run on either documents, or on 
-//   keyword dictionaries, which can be useful if you are clustering things 
-//   other than documents, like words or sentences.
-//   This function will, if the input is a list of documents, extract the 
-//   keyword list
+// @fileoverview Extract the keywords from a list of documents or keyword
+//   dictionary
 // @param docs {tab;dict[]} A list of documents, or a list of keyword 
 //   dictionaries
 // @returns {dict[]} Keyword dictionaries
@@ -50,8 +47,7 @@ cluster.bisectingKMeans:{[docs;k;iters]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview The bisecting k-means algorithm which uses k-means to 
-//   repeatedly split the most cohesive clusters into two clusters
+// @fileoverview Split the document into clusters using kmeans
 // @param iters {long} The number of times to iterate the refining step
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param clusters {long} Cluster indices
@@ -78,7 +74,7 @@ cluster.kmeans:{[docs;k;iters]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview k-means clustering for documents
+// @fileoverview Apply k-means clustering to a document
 // @param docs {dict[]} Keywords in documents
 // @param clusters {long[]} Cluster indices
 // @returns {long[][]} The documents' indices, grouped into clusters
@@ -158,8 +154,8 @@ cluster.i.similarClusters:{[clusters;counts;idx]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview An extremely fast clustering algorithm for very large datasets
-//   Produces small but cohesive clusters.
+// @fileoverview Uses the Radix clustering algorithm and bins are taken from 
+//   the top 3 terms of each document
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param numOfClusters {long} The number of clusters desired, though fewer 
 //   may be returned.
@@ -188,8 +184,8 @@ cluster.radix:{[docs;n]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview An extremely fast clustering algorithm for very large datasets
-//   Produces small but cohesive clusters.
+// @fileoverview Uses the Radix clustering algorithm and bins by the most 
+//   significant term
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param numOfClusters {long} The number of clusters desired, though fewer may
 //   be returned.
