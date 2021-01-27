@@ -69,7 +69,7 @@ email.i.extractText:{[msg]
   if[10=msgType;:msg];
   if[4=msgType;:""];
   if[99=msgType;:.z.s msg`content];
-  findMime:email.i.findMime[]msg;
+  findMime:email.i.findMime[;msg];
   text:$[count i:where findMime["text/plain"];
       {x[y][`payload]`content}[msg]each i;
     count i:where findMime["text/html"];
@@ -163,7 +163,7 @@ email.get.i.payload:{[msg]
   if[msg[`:is_multipart][]`;:email.i.parseMbox1 each msg[`:get_payload][]`];
   // Raw bytes decoded from base64 encoding, wrapped embedPy
   raw:msg[`:get_payload;`decode pykw 1]; 
-  rtf:"application/rtf"~(msg[`:get_content_type][]`);
+  rtf:"application/rtf"~email.get.i.contentType msg;
   attachment:"attachment"~msg[`:get_content_disposition][]`;
   payload:`attachment`content!(0b;raw`);
   if[all(rtf;attachment);:payload];
