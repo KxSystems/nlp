@@ -11,17 +11,20 @@ tm.i.parseDay:{[day]
   }
 
 // @private
-// @kind function
+// @kind data
 // @category nlpTimeUtility
-// @fileoverview The months of the year
+// @fileoverview Dictionary mapping the months of the year 
+//   to a symbol denoting integer representation
 tm.i.months:`jan`feb`mar`apr`may`jun`jul`aug`sep`oct`nov`dec!`$string 1+til 12
 
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Pads a string containing a month to two digits
-// @param day {str} Contains a month
-// @returns {str} Padded month string
+// @fileoverview Convert a long-form or short-form month string to 
+//   a string denoting the month as an integer "feb"/"february"
+//   become "02"
+// @param day {str} A month of the year in English
+// @returns {str} A padded integer representing the month of the year
 tm.i.parseMonth:{[month]
   -2#"0",string month^tm.i.months month:lower`$3 sublist month
   }
@@ -29,7 +32,9 @@ tm.i.parseMonth:{[month]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Pad year string to 4 digits (>35 deemed 1900s)
+// @fileoverview Pad a string denoting a year to 4 digits
+//   if input > 35 this is deemed to be 1900s 
+//   i.e. "20" -> "2020" / "44" -> "1944")
 // @param year {str} Contains a year
 // @returns {str} Padded year value
 tm.i.parseYear:{[year]
@@ -39,9 +44,11 @@ tm.i.parseYear:{[year]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Convert year string to date range
-// @param year {str} A year value
-// @returns {str} Date range
+// @fileoverview Convert year string to the entire date
+//   encapsulating that year
+// @param year {str} A year 
+// @returns {str} Date range from Jan 1 to Dec 31 of
+//   the specified year
 tm.i.convY:{[year]
   "D"$year,/:(".01.01";".12.31")
   }
@@ -49,9 +56,13 @@ tm.i.convY:{[year]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Convert yearMonth string to date range
-// @param text {str} Contains yearMonth value
-// @returns {str} yearMonth value as a date range
+// @fileoverview Convert string containing yearMonth
+//   to the date range encapsulating that month
+//   i.e. "test 2020.02" -> 2020.02.01 2020.02.29
+//        "2019.02 test" -> 2019.02.01 2019.02.28
+// @param text {str} Text containing yearMonth value
+// @returns {str} Date range for the month of the
+//   provided yearMonth
 tm.i.convYearMonth:{[text]
   txt:regex.matchAll[;text]each regex.objects`year`month;
   matches:ungroup([format:"ym"]txt);
@@ -75,14 +86,18 @@ tm.i.formatYM:{[ym]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// fileoverview Convert yearMonthDay string to date range
-// @param text {str} Contains yearMonthDay value
-// @returns {str} yearMonthDay as a date range
+// fileoverview Convert string containing yearMonthDay
+//   to the date range encapsulating that day
+//   i.e. "test 2020.01.01" -> 2020.01.01 2020.01.01
+//        "2010.01.01 test" -> 2010.01.01 2010.01.01
+// @param text {str} Text containing yearMonthDay value 
+// @returns {str} Date range associated with the
+//   provided yearMonthDay
 tm.i.convYearMonthDay:{[text]
   txt:regex.matchAll[;text]each regex.objects`year`month`day;
   matches:ungroup([format:"ymd"]txt);
   updMatches:matches,'flip`txt`s`e!flip matches`txt;
-  matches:value select format,last txt by s from updMatches; 
+  matches:value select format,last txt by s from updMatches;
   format:tm.i.formatYMD/[matches`format];
   format:tm.i.resolveFormat raze@[format;where 1<count each format;:;" "];  
   2#"D"$"."sv tm.i[`parseYear`parseMonth`parseDay]@'matches[`txt]idesc format
@@ -120,23 +135,24 @@ tm.i.resolveFormat:{[format]
 // @kind function
 // @category nlpTimeUtility
 // @fileoverview The format to use, given a single known position
-tm.i.dateFormats:(!). flip( / format given single known position
-  ("d  ";"dmy"); // 2nd 12 12
-  ("m  ";"mdy"); // Jan 12 12
-  ("y  ";"ymd"); // 1999 12 12
-  (" d ";"mdy"); // 12 2nd 12
-  (" m ";"dmy"); // 12 Jan 12
-  (" y ";"dym"); // 12 1999 12 This is never conventionally used
-  ("  d";"ymd"); // 12 12 2nd
-  ("  m";"ydm"); // 12 12 Jan This is never conventionally used
-  ("  y";"dmy")) // 12 12 1999 //mdy is the american option
+tm.i.dateFormats:(!). flip(
+  ("d  ";"dmy"); // 10th 02 99
+  ("m  ";"mdy"); // Feb 10 99
+  ("y  ";"ymd"); // 1999 02 10
+  (" d ";"mdy"); // 02 10th 99
+  (" m ";"dmy"); // 10 Feb 99
+  (" y ";"dym"); // 10 1999 02 This is never conventionally used
+  ("  d";"ymd"); // 99 02 10th
+  ("  m";"ydm"); // 99 10 Feb This is never conventionally used
+  ("  y";"dmy")) // 10 02 1999 //mdy is the american option
 
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Turns a string matching the time regex into a q time
-// @param text {str} A string that matches the time regex
-// @returns {minute[];second} The value from the string as a q time
+// @fileoverview Turns a regex time string into a q time
+// @param text {str} A time string
+// @returns {minute[];second} The q time parsed from an
+//   appropriate string
 tm.i.parseTime:{[text]
   numText:vs[" ";text][0]in"1234567890:.";
   time:"T"$text where numText; 
@@ -148,7 +164,7 @@ tm.i.parseTime:{[text]
 // @kind function
 // @category nlpTimeUtility
 // @fileoverview Remove any null values
-// @array {num[][]} array of values
+// @array {num[][]} Array of values
 // returns {num[][]} Array with nulls removed
 tm.i.rmNull:{[array]
   array where not null array[;0]
@@ -158,7 +174,8 @@ tm.i.rmNull:{[array]
 // @category nlpTime
 // @fileoverview Find any times in a string
 // @param text {str} A document, potentially containing many times
-// @returns {any[]} A list of 4 tuples (time; timeText; startIndex; 1+endIndex)
+// @returns {any[]} A list of tuples for each time containing
+//   (q-time; timeText; startIndex; 1+endIndex)
 tm.findTimes:{[text]
   timeText:regex.matchAll[regex.objects.time;text];
   parseTime:tm.i.parseTime each timeText[;0];
@@ -170,7 +187,7 @@ tm.findTimes:{[text]
 // @category nlpTime
 // @fileoverview Find all the dates in a document
 // @param text {str} A document, potentially containing many dates
-// @returns {any[]} A list of 5-tuples 
+// @returns {any[]} A list of tuples for each time containing 
 //   (startDate; endDate; dateText; startIndex; 1+endIndex)
 tm.findDates:{[text]
   ym:regex.matchAll[regex.objects.yearmonth;text];
