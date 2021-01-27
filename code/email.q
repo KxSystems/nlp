@@ -70,7 +70,7 @@ email.i.extractText:{[msg]
   if[4=msgType;:""];
   if[99=msgType;:.z.s msg`content];
   findMime:email.i.findMime[]msg;
-  text:$[count i:were findMime["text/plain"];
+  text:$[count i:where findMime["text/plain"];
       {x[y][`payload]`content}[msg]each i;
     count i:where findMime["text/html"];
       {email.i.html2text x[y][`payload]`content}[msg]each i;
