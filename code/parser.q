@@ -1,7 +1,5 @@
 \d .nlp
 
-.p.import[`sys;:;`:argv;()]; / spacy expects python be the main process
-
 p)def spell(doc,model):
   lst=[]
   for s in doc:
@@ -77,7 +75,7 @@ parser.newParser:{[lang;opts]
 parser.i.newSubParser:{[lang;opts;disabled] 
  chklng:parser.i.alphalang lang;
  model:.p.import[$[`~chklng;`spacy;sv[`]`spacy.lang,lang]][hsym$[`~chklng;`load;chklng]
-   ]. raze[$[`~chklng;lang;()];`disable pykw disabled]; 
+   ]. raze[$[`~chklng;lang;()];`disable pykw disabled];
   if[`sbd in opts;model[`:add_pipe]$[`~chklng;model[`:create_pipe;`sentencizer];.p.pyget `x_sbd]];
   if[`spell in opts;if[not .p.import[`spacy.tokens][`:Token][`:has_extension]["hunspell_spell"]`;
    sphun:.p.import[`spacy_hunspell]`:spaCyHunSpell;hunspell:sphun[model;
