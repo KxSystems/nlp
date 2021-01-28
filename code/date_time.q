@@ -3,7 +3,8 @@
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Pads a string containing a date to two digits
+// @fileoverview Pads a string containing a single integer to two digits
+//   or extracts the last 2 digits from a string
 // @param day {str} Contains a date
 // @returns {str} Padded date to two digits
 tm.i.parseDay:{[day]
@@ -76,9 +77,10 @@ tm.i.convYearMonth:{[text]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Extract formats of dates (YearMonth)
-// @params ym {str[]} The format for each date object
-// @returns {str} Formats of dates 
+// @fileoverview Seperate YearMonth formats to year and month
+//   i.e "ym" -> "y","m"
+// @params ym {str[]} The format for each date objecct
+// @returns {str} Formats of YearMonths objects seperated
 tm.i.formatYM:{[ym]
   @[ym;where not counts;except[;raze ym where counts:1=count each ym]]
   }
@@ -106,9 +108,10 @@ tm.i.convYearMonthDay:{[text]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Extract formats of dates (YearMonthDay)
-// @params ymd {str[]} The format for each date object
-// @returns {str} Formats of dates 
+// @fileoverview Seperate YearMonth formats to year and month
+//   i.e "ymd" -> "y","m","d"
+// @params ymd {str[]} The format for each date objecct
+// @returns {str} Formats of YearMonthDays objects seperated
 tm.i.formatYMD:{[ymd]
   @[ymd;i unq;:;"ymd" unq:where 1=count each i:where each "ymd" in/:\:ymd]
   }
@@ -149,9 +152,11 @@ tm.i.dateFormats:(!). flip(
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Turns a regex time string into a q time
+// @fileoverview Turns a regex time string into a q timestamp
+//   i.e "131030" -> 13:10:30.000
+//       "1pm"    -> 13:00:00.000
 // @param text {str} A time string
-// @returns {minute[];second} The q time parsed from an
+// @returns {timestamp} The q time parsed from an
 //   appropriate string
 tm.i.parseTime:{[text]
   numText:vs[" ";text][0]in"1234567890:.";
