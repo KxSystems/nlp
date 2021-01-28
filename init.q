@@ -8,6 +8,7 @@ loadfile`:code/regex.q
 loadfile`:code/sent.q
 loadfile`:code/parser.q
 loadfile`:code/date_time.q
+loadfile`:code/extract_rtf.p
 loadfile`:code/email.q
 loadfile`:code/cluster.q
 loadfile`:code/nlp_code.q

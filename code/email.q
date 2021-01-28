@@ -1,35 +1,10 @@
 \d .nlp
 
-//Loading python script to extract rtf text
-system"l ",.nlp.path,"/","code/extract_rtf.p";
-
 // @private
 // @kind function
 // @category nlpEmailUtility
-// @fileoverview Regular expression function imported from python
-i.striprtf:.p.get[`striprtf;<]
-
-// @kind function
-// @category nlpEmail
-// @fileoverview Convert an MBOX file to a table of parsed metadata
-// @param filepath {str} The path to the mbox
-// @returns {tab} Parsed metadata and content from the mbox
-email.getMboxText:{[filepath]
-  parseMbox:email.i.parseMbox filepath;
-  update text:.nlp.email.i.extractText each payload from parseMbox
-  }
-
-// @kind function
-// @category nlpEmail
-// @fileoverview Get the graph of who emailed who, including the number of 
-//   times they emailed
-// @param emails {tab} The result of .nlp.loadEmails
-// @returns {tab} Defines to-from pairings of emails
-email.getGraph:{[emails]
-  getToFrom:flip`$raze email.i.getToFrom each emails;
-  getToFromTab:flip`sender`to!getToFrom;
-  0!`volume xdesc select volume:count i by sender,to from getToFromTab
-  }
+// @fileoverview Rich Text Format (RTF) parsing function imported from python
+email.i.striprtf:.p.get[`striprtf;<]
 
 // @private
 // @kind function
@@ -75,7 +50,7 @@ email.i.extractText:{[msg]
       {email.i.html2text x[y][`payload]`content}[msg]each i;
     count i:where findMime["application/rtf"];
       // Use python script to extract text from rtf
-      {i.striprtf x[y][`payload]`content}[msg]each i;
+      {email.i.striprtf x[y][`payload]`content}[msg]each i;
     .z.s each msg`payload
     ];
   "\n\n"sv text
@@ -100,7 +75,7 @@ email.i.getToFrom:{[msg]
 // @fileoverview Extract the sender information from an email
 // @param emails {<} The email as an embedPy object
 // @returns {str[]} Sender name and email
-email.get.i.sender:{[emails]
+email.i.getSender:{[emails]
   fromInfo:raze emails[`:get_all;<]each("from";"resent-from");
   email.i.getAddr fromInfo where not(::)~'fromInfo
   }
@@ -111,7 +86,7 @@ email.get.i.sender:{[emails]
 // @fileoverview Extract the receiver information from an email
 // @param emails {<} The email as an embedPy object
 // @returns {str[]} Reciever name and email
-email.get.i.to:{[emails]
+email.i.getTo:{[emails]
   toInfo:raze emails[`:get_all;<]each("to";"cc";"resent-to";"resent-cc");
   email.i.getAddr toInfo where not any(::;"")~/:\:toInfo
   }
@@ -122,7 +97,7 @@ email.get.i.to:{[emails]
 // @fileoverview Extract the date information from an email
 // @param emails {<} The email as an embedPy object
 // @returns {timestamp} Date email was sent
-email.get.i.date:{[emails]
+email.i.getDate:{[emails]
   dates:string 6#email.i.parseDate emails[@;`date];
   "P"$"D"sv".:"sv'3 cut{$[1=count x;"0";""],x}each dates
   }
@@ -133,7 +108,7 @@ email.get.i.date:{[emails]
 // @fileoverview Extract the subject information from an email
 // @param emails {<} The email as an embedPy object
 // @returns {str} Subject of the email
-email.get.i.subject:{[emails]
+email.i.getSubject:{[emails]
   subject:emails[@;`subject];
   $[(::)~subject`;
     "";
@@ -147,7 +122,7 @@ email.get.i.subject:{[emails]
 // @fileoverview Extract the content type of an email
 // @param emails {<} The email as an embedPy object
 // @returns {str} Content type of an email 
-email.get.i.contentType:{[emails]
+email.i.getContentType:{[emails]
   emails[`:get_content_type][]`
   }
 
@@ -158,32 +133,24 @@ email.get.i.contentType:{[emails]
 // @param emails {<} The email as an embedPy object
 // @returns {dict;tab} Dictionary of `attachment`content or a table of payloads
 //   Content is byte[] for binary data, char[] for text
-email.get.i.payload:{[emails]
-  if[emails[`:is_multipart][]`;:email.i.parseMbox1 each emails[`:get_payload][]`];
+email.i.getPayload:{[emails]
+  if[emails[`:is_multipart][]`;
+    :email.i.parseMbox1 each emails[`:get_payload][]`
+    ];
   // Raw bytes decoded from base64 encoding, wrapped embedPy
   raw:emails[`:get_payload;`decode pykw 1]; 
-  rtf:"application/rtf"~email.get.i.contentType emails;
+  rtf:"application/rtf"~email.i.getContentType emails;
   attachment:"attachment"~emails[`:get_content_disposition][]`;
   payload:`attachment`content!(0b;raw`);
   if[all(rtf;attachment);:payload];
   if[attachment;
     payload,`attachment`filename!(1b;email[`:get_filename][]`);
     ];
-  content:email.get.i.contentType emails;
+  content:email.i.getContentType emails;
   if[not any content~/:("text/html";"text/plain";"message/rfc822");:payload];
   charset:emails[`:get_content_charset][]`;
   content:i.str[raw;$[(::)~charset;"us-ascii";charset];"ignore"]`;
   `attachment`content!(0b;content)
-  }
-
-// @private
-// @kind function
-// @category nlpEmailUtility
-// @fileoverview Extract meta information from an email 
-// @params filepath {str} The path to where the email is stored
-// @returns {dict} Meta information from the email
-email.i.parseMail:{[filepath]
-  email.i.parseMbox1 email.i.msgFromString[filepath]`.
   }
 
 // @private
@@ -204,8 +171,9 @@ email.i.parseMbox:{[filepath]
 // @params mbox {<} Emails in mbox format
 // @returns {dict} Meta information from the email
 email.i.parseMbox1:{[mbox]
-  msgInfo:`sender`to`date`subject`contentType`payload;
-  msgInfo!email.get.i[msgInfo]@\:.p.wrap mbox
+  columns:`sender`to`date`subject`contentType`payload;
+  msgInfo:`getSender`getTo`getDate`getSubject`getContentType`getPayload;
+  columns!email.i[msgInfo]@\:.p.wrap mbox
   }
 
 // Python imports
@@ -216,3 +184,35 @@ email.i.decodeHdr:.p.import[`email.header;`:decode_header]
 email.i.makeHdr:.p.import[`email.header;`:make_header]
 email.i.msgFromString:.p.import[`email]`:message_from_string
 email.i.mbox:.p.import[`mailbox]`:mbox
+
+
+// @kind function
+// @category nlpEmail
+// @fileoverview Convert an mbox file to a table of parsed metadata
+// @param filepath {str} The path to the mbox file
+// @returns {tab} Parsed metadata and content of the mbox file
+email.loadEmails:{[filepath]
+  parseMbox:email.i.parseMbox filepath;
+  update text:.nlp.email.i.extractText each payload from parseMbox
+  }
+
+// @kind function
+// @category nlpEmail
+// @fileoverview Get the graph of who emailed who, including the number of
+//   times they emailed
+// @param emails {tab} The result of .nlp.loadEmails
+// @returns {tab} Defines to-from pairings of emails
+email.getGraph:{[emails]
+  getToFrom:flip`$raze email.i.getToFrom each emails;
+  getToFromTab:flip`sender`to!getToFrom;
+  0!`volume xdesc select volume:count i by sender,to from getToFromTab
+  }
+
+// @kind function
+// @category nlpEmailUtility
+// @fileoverview Extract meta information from an email
+// @params filepath {str} The path to where the email is stored
+// @returns {dict} Meta information from the email
+email.parseMail:{[filepath]
+  email.i.parseMbox1 email.i.msgFromString[filepath]`.
+  }
