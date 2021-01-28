@@ -202,7 +202,7 @@ parser.i.adjustIndices:{[text;doc]
 // @private
 // @kind function
 // @category nlpParserUtility
-//@fileoverview Removes punctuation and space tokens and updates indices
+// @fileoverview Removes punctuation and space tokens and updates indices
 // @param doc {dict} The parsed document
 // @returns {dict} The parsed document with punctuation removed
 parser.i.removePunct:{[doc]
@@ -230,4 +230,3 @@ parser.newParser:{[modelName;fieldNames]
   stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
   parser.i.runParser[pyParser;fieldNames;options;stopWords]
   }
-
