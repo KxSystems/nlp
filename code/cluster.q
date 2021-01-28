@@ -1,7 +1,8 @@
 \d .nlp
 
+// @private
 // @kind function
-// @category nlpClustering
+// @category nlpClusteringUtility
 // @fileoverview Extract the keywords from a list of documents or keyword
 //   dictionary
 // @param docs {tab;dict[]} A list of documents, or a list of keyword 
@@ -10,38 +11,6 @@
 cluster.i.asKeywords:{[docs]
   keyWords:$[-9=type docs[0]`keywords;docs;docs`keywords];
   i.fillEmptyDocs keyWords
-  }
-
-// @kind function
-// @category nlpClustering
-// @fileoverview Get the cohesiveness of a cluster as measured by the mean 
-//   sum of squares error
-// @param docs {dict[]} A document's keyword field
-// @returns {float} The cohesion of the cluster
-cluster.MSE:{[docs]
-  n:count docs;
-  if[(0=n)|0=sum count each docs,(::);:0n];
-  if[1=n;:1f];
-  centroid:i.takeTop[50]i.fastSum docs;
-  docs:i.fillEmptyDocs docs;
-  // Don't include the current document in the centroid, or for small clusters
-  // it just reflects its similarity to itself
-  dists:0^compareDocToCentroid[centroid]each docs;
-  avg dists*dists
-  }
-
-// @kind function
-// @category nlpClustering
-// @fileoverview The bisecting k-means algorithm which uses k-means to 
-//   repeatedly split the most cohesive clusters into two clusters
-// @param docs {tab;dict[]} A list of documents, or document keywords
-// @param k {long} The number of clusters to return
-// @param iters {long} The number of times to iterate the refining step
-// @returns {long[][]} The documents' indices, grouped into clusters
-cluster.bisectingKMeans:{[docs;k;iters]
-  docs:cluster.i.asKeywords docs;
-  if[0=n:count docs;:()];
-  (k-1)cluster.i.bisect[iters;docs]/enlist til n
   }
 
 // @private
@@ -58,19 +27,6 @@ cluster.i.bisect:{[iters;docs;clusters]
   (clusters _ idx),cluster@/:cluster.kmeans[docs cluster;2;iters]
   }
 
-// @kind function
-// @category nlpClustering
-// @fileoverview k-means clustering for documents
-// @param docs {tab;dict[]} A list of documents, or document keywords
-// @param k {long} The number of clusters to return
-// @param iters {long} The number of times to iterate the refining step
-// @returns {long[][]} The documents' indices, grouped into clusters
-cluster.kmeans:{[docs;k;iters]
-  docs:cluster.i.asKeywords docs;
-  numDocs:count docs;
-  iters cluster.i.kmeans[docs]/(k;0N)#neg[numDocs]?numDocs
-  }
-
 // @private
 // @kind function
 // @category nlpClusteringUtility
@@ -81,23 +37,6 @@ cluster.kmeans:{[docs;k;iters]
 cluster.i.kmeans:{[docs;clusters]
   centroids:(i.takeTop[3]i.fastSum@)each docs clusters;
   value group i.maxIndex each centroids compareDocs\:/:docs
-  }
-
-// @kind function
-// @category nlpClustering
-// @fileoverview Given a list of centroids and a list of documents, match each
-//   document to its nearest centroid
-// @param centroids {dict[]} Centroids as keyword dictionaries
-// @param docs {dict[]} A list of document feature vectors
-// @returns {long[][]} Lists of document indices where each list is a cluster
-//   N.B. These don't line up with the number of centroids passed in,
-//   and the number of lists returned may not equal the number of centroids.
-//   There can be documents which match no centroids (all of which will end up 
-//   in the same group), and centroids with no matching documents.
-cluster.groupByCentroids:{[centroids;docs]
-  // If there are no centroids, everything is in one group
-  if[not count centroids;:enlist til count docs];
-  value group cluster.i.findNearestNeighbor[centroids]each docs
   }
 
 // @private
@@ -150,6 +89,133 @@ cluster.i.similarClusters:{[clusters;counts;idx]
   similar:.5<=avg each clusters[idx]in/:clusters;
   notSmaller:(count clusters idx)>=count each clusters;
   where superset or(similar & notSmaller)
+  }
+
+// @private
+// @kind function
+// @category nlpClusteringUtility
+// @fileoverview Normalize the columns of a matrix so they sum to 1
+// @param matrix {float[][]} Numeric matrix of values 
+// @returns {float[][]} The normalized columns
+cluster.i.columnNormalize:{[matrix]
+  0f^matrix%\:sum matrix
+  }
+
+// @private
+// @kind function
+// @category nlpClusteringUtility
+// @fileoverview Graph clustering that works on a similarity matrix
+// @param matrix {bool[][]} NxN adjacency matrix
+// @returns {long[][]} Lists of indices in the corpus where each row 
+//   is a cluster
+cluster.i.similarityMatrix:{[matrix]
+  matrix:"f"$matrix;
+  // Make the matrix stochastic and run MCL until stable
+  normMatrix:cluster.i.columnNormalize matrix;
+  attractors:cluster.i.MCL/[normMatrix];
+  // Use output of MCL to get the clusters
+  clusters:where each attractors>0;
+  // Remove empty clusters and duplicates
+  distinct clusters where 0<>count each clusters
+  }
+
+// @private
+// @kind function
+// @category nlpClusteringUtility
+// @fileoverview SM Van Dongen's MCL clustering algorithm
+// @param matrix {float[][]} NxN matrix
+// @return {float[][]} MCL algorithm applied to matrix
+cluster.i.MCL:{[matrix]
+  // Expand matrix by raising to the nth power (currently set to 2)
+  do[2-1;mat:{i.np[`:matmul;x;x]`}matrix];
+  mat:cluster.i.columnNormalize mat*mat;
+  @[;;:;0f] ./:flip(mat;where each(mat>0)&(mat<.00001))
+  }
+
+// @kind function
+// @category nlpClustering
+// @fileoverview A clustering algorithm that works like many summarizing 
+//   algorithms, by finding the most representive elements, then subtracting 
+//   them from the centroid, and iterating until the number of clusters has 
+//   been reached
+// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param numOfClusters {long} The number of clusters to return
+// @returns {long[][]} The documents' indices grouped into clusters
+cluster.summarize:{[docs;n]
+  if[0=count docs;:()];
+  docs:i.takeTop[10]each cluster.i.asKeywords docs;
+  summary:i.fastSum[docs]%count docs;
+  centroids:();
+  do[n;
+    // Find the document that summarizes the corpus best
+    // and move that document to the centroid list
+    centroids,:nearest:i.maxIndex docs[;i.maxIndex summary];
+    summary-:docs nearest;
+    summary:(where summary<0)_ summary
+    ];
+  cluster.groupByCentroids[docs centroids;docs]
+  }
+
+// @kind function
+// @category nlpClustering
+// @fileoverview Get the cohesiveness of a cluster as measured by the mean 
+//   sum of squares error
+// @param docs {dict[]} A document's keyword field
+// @returns {float} The cohesion of the cluster
+cluster.MSE:{[docs]
+  n:count docs;
+  if[(0=n)|0=sum count each docs,(::);:0n];
+  if[1=n;:1f];
+  centroid:i.takeTop[50]i.fastSum docs;
+  docs:i.fillEmptyDocs docs;
+  // Don't include the current document in the centroid, or for small clusters
+  // it just reflects its similarity to itself
+  dists:0^compareDocToCentroid[centroid]each docs;
+  avg dists*dists
+  }
+
+// @kind function
+// @category nlpClustering
+// @fileoverview The bisecting k-means algorithm which uses k-means to 
+//   repeatedly split the most cohesive clusters into two clusters
+// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param k {long} The number of clusters to return
+// @param iters {long} The number of times to iterate the refining step
+// @returns {long[][]} The documents' indices, grouped into clusters
+cluster.bisectingKMeans:{[docs;k;iters]
+  docs:cluster.i.asKeywords docs;
+  if[0=n:count docs;:()];
+  (k-1)cluster.i.bisect[iters;docs]/enlist til n
+  }
+
+// @kind function
+// @category nlpClustering
+// @fileoverview k-means clustering for documents
+// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param k {long} The number of clusters to return
+// @param iters {long} The number of times to iterate the refining step
+// @returns {long[][]} The documents' indices, grouped into clusters
+cluster.kmeans:{[docs;k;iters]
+  docs:cluster.i.asKeywords docs;
+  numDocs:count docs;
+  iters cluster.i.kmeans[docs]/(k;0N)#neg[numDocs]?numDocs
+  }
+
+// @kind function
+// @category nlpClustering
+// @fileoverview Given a list of centroids and a list of documents, match each
+//   document to its nearest centroid
+// @param centroids {dict[]} Centroids as keyword dictionaries
+// @param docs {dict[]} A list of document feature vectors
+// @returns {long[][]} Lists of document indices where each list is a cluster
+//   N.B. These don't line up with the number of centroids passed in,
+//   and the number of lists returned may not equal the number of centroids.
+//   There can be documents which match no centroids (all of which will end up 
+//   in the same group), and centroids with no matching documents.
+cluster.groupByCentroids:{[centroids;docs]
+  // If there are no centroids, everything is in one group
+  if[not count centroids;:enlist til count docs];
+  value group cluster.i.findNearestNeighbor[centroids]each docs
   }
 
 // @kind function
@@ -234,69 +300,4 @@ cluster.MCL:{[docs;minimum;sample]
   // Move each non-outlier to the nearest centroid
   nonOutliers:(til count docs)except idx outliers;
   nonOutliers cluster.groupByCentroids[centroids;docs nonOutliers]
-  }
-
-// @private
-// @kind function
-// @category nlpClusteringUtility
-// @fileoverview Normalize the columns of a matrix so they sum to 1
-// @param matrix {float[][]} Numeric matrix of values 
-// @returns {float[][]} The normalized columns
-cluster.i.columnNormalize:{[matrix]
-  0f^matrix%\:sum matrix
-  }
-
-// @private
-// @kind function
-// @category nlpClusteringUtility
-// @fileoverview Graph clustering that works on a similarity matrix
-// @param matrix {bool[][]} NxN adjacency matrix
-// @returns {long[][]} Lists of indices in the corpus where each row 
-//   is a cluster
-cluster.i.similarityMatrix:{[matrix]
-  matrix:"f"$matrix;
-  // Make the matrix stochastic and run MCL until stable
-  normMatrix:cluster.i.columnNormalize matrix;
-  attractors:cluster.i.MCL/[normMatrix];
-  // Use output of MCL to get the clusters
-  clusters:where each attractors>0;
-  // Remove empty clusters and duplicates
-  distinct clusters where 0<>count each clusters
-  }
-
-// @private
-// @kind function
-// @category nlpClusteringUtility
-// @fileoverview SM Van Dongen's MCL clustering algorithm
-// @param matrix {float[][]} NxN matrix
-// @return {float[][]} MCL algorithm applied to matrix
-cluster.i.MCL:{[matrix]
-  // Expand matrix by raising to the nth power (currently set to 2)
-  do[2-1;mat:{i.np[`:matmul;x;x]`}matrix];
-  mat:cluster.i.columnNormalize mat*mat;
-  @[;;:;0f] ./:flip(mat;where each(mat>0)&(mat<.00001))
-  }
-
-// @kind function
-// @category nlpClustering
-// @fileoverview A clustering algorithm that works like many summarizing 
-//   algorithms, by finding the most representive elements, then subtracting 
-//   them from the centroid, and iterating until the number of clusters has 
-//   been reached
-// @param docs {tab;dict[]} A list of documents, or document keywords
-// @param numOfClusters {long} The number of clusters to return
-// @returns {long[][]} The documents' indices grouped into clusters
-cluster.summarize:{[docs;n]
-  if[0=count docs;:()];
-  docs:i.takeTop[10]each cluster.i.asKeywords docs;
-  summary:i.fastSum[docs]%count docs;
-  centroids:();
-  do[n;
-    // Find the document that summarizes the corpus best
-    // and move that document to the centroid list
-    centroids,:nearest:i.maxIndex docs[;i.maxIndex summary];
-    summary-:docs nearest;
-    summary:(where summary<0)_ summary
-    ];
-  cluster.groupByCentroids[docs centroids;docs]
   }
