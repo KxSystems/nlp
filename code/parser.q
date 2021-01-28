@@ -94,23 +94,6 @@ parser.i.alphaLang:(!). flip(
 
 // @private
 // @kind function
-// @category nlpParserUtility
-// @fileOverview Create a new parser
-// @param modelName {sym} The spaCy modeli/language to use. 
-//   This must already be installed.
-// @param fieldNames {sym[]} The fields the parser should return
-// @returns {func} A function to parse text
-parser.newParser:{[modelName;fieldNames]
-  options:{distinct x,raze parser.i.depOpts x}/[fieldNames];
-  disabled:`ner`tagger`parser except options;
-  model:parser.i.newSubParser[modelName;options;disabled];
-  tokenAttrs:parser.i.q2spacy key[parser.i.q2spacy]inter options;
-  pyParser:parser.i.parseText[model;tokenAttrs;options;];
-  stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
-  parser.i.runParser[pyParser;fieldNames;options;stopWords]
-  }
-
-// @kind function
 // @category nlpParser
 // @fileOverview Create a new parser
 // @param modelName {sym} The spaCy model/language to use. 
@@ -230,3 +213,21 @@ parser.i.removePunct:{[doc]
   if[`sentIndices in attrs;doc:@[doc;`sentIndices;idx]];
   doc _`isPunct
   }
+
+// @kind function
+// @category nlpParserUtility
+// @fileOverview Create a new parser
+// @param modelName {sym} The spaCy modeli/language to use. 
+//   This must already be installed.
+// @param fieldNames {sym[]} The fields the parser should return
+// @returns {func} A function to parse text
+parser.newParser:{[modelName;fieldNames]
+  options:{distinct x,raze parser.i.depOpts x}/[fieldNames];
+  disabled:`ner`tagger`parser except options;
+  model:parser.i.newSubParser[modelName;options;disabled];
+  tokenAttrs:parser.i.q2spacy key[parser.i.q2spacy]inter options;
+  pyParser:parser.i.parseText[model;tokenAttrs;options;];
+  stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
+  parser.i.runParser[pyParser;fieldNames;options;stopWords]
+  }
+
