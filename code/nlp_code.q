@@ -8,17 +8,6 @@ findDates:tm.findDates
 // Find all times : list of 4-tuples (time; timeText; startIndex; 1+endIndex)
 findTimes:tm.findTimes
 
-// Email
-
-// Read mbox file, convert to table, parse metadata & content
-email.loadEmails:loadEmails:email.getMboxText
-
-// Graph of who emailed whom, inc number of mails
-email.getGraph:{[msgs]
-  0!`volume xdesc select volume:count i by sender,to from flip`sender`to!flip`$raze email.i.getToFrom each msgs}
-
-email.parseMail:email.i.parseMail
-
 // Sentiment
 
 // Calculate sentiment of sentence of short message
