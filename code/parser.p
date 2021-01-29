@@ -6,7 +6,8 @@ p)def spell(doc,model):
       sug=s._.hunspell_suggest
       if len(sug)>0:
         ([lst.append(n)for n in model((sug)[0])]) 
-      else:lst.append(s)
+      else:
+        lst.append(s)
     else:
         lst.append(s)
   return lst
@@ -32,4 +33,8 @@ p)def x_sbd(doc):
       doc[i+1].is_sent_start=token.text in ['。','？','！']
   return doc
 
+## Python functionality for the generation of a url parser
+p)from urllib.parse import urlparse
+p)import re
+p)seReg=re.compile('([a-z0-9]+:)?//')
 
