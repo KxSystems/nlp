@@ -9,9 +9,19 @@ parser.i.parseText:.p.get[`get_doc_info;<];
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview Retrieve python function to decode bytes
-parser.i.cleanUTF8:.p.import[`builtins;`:bytes.decode;<]
-  [;`errors pykw`ignore]$["x"]@;
+// @fileoverview Convert string input to an appropriate
+//   byte representation suitable for application in Python
+//   functions, this is particularly useful when dealing with
+//   languages other than English
+// @param data {str} Any input string containing any character
+//   arrays
+// @returns {str} The data parsed such that UTF-8 compliant
+//   characters can be appropriately managed by the NLP models
+parser.i.cleanUTF8:{[data]
+  byteDecode:.p.import[`builtins;`:bytes.decode;<];
+  // Convert data to bytes and decode to appropriate string
+  byteDecode["x"$data;`errors pykw`ignore]
+  }
 
 // @private
 // @kind data
@@ -133,7 +143,7 @@ parser.i.unpack:{[pyParser;options;stopWords;text]
 // @kind function
 // @category nlpParserUtility
 // @fileoverview This converts python indices to q indices in the text
-//   This has to be done because python indexes into strings by char instead 
+//   This has to be done because python indexes into strings by char instead
 //   of byte, so must be modified to index a q string
 // @param text {str} The text being parsed
 // @param doc {dict} The parsed document
@@ -171,14 +181,39 @@ parser.i.removePunct:{[doc]
   doc _`isPunct
   }
 
+// @private
 // @kind function
 // @category nlpParserUtility
+// @fileoverview Parse a URL into its constituent components
+// @param url {str} The URL to be decomposed into its components
+// @returns {str[]} The components which make up the 
+parser.i.parseURLs:{[url]
+  pyLambda:"lambda url: urlparse(url if seReg.match(url) ",
+    "else 'http://' + url)";
+  .p.eval[pyLambda;<]url
+  }
+
+// @kind function
+// @category nlpParser
+// @fileOverview Parse URLs into dictionaries containing the
+//   constituent components
+// @param url {str} The URL to decompose into its components
+// @returns {dict} A dictionary containing information about
+//   the scheme, domain name and other URL information
+parseURLs:{[url]
+  urlKeys:`scheme`domainName`path`parameters`query`fragment;
+  urlVals:parser.i.parseURLs url;
+  urlKeys!urlVals
+  }
+
+// @kind function
+// @category nlpParser
 // @fileOverview Create a new parser
-// @param modelName {sym} The spaCy modeli/language to use. 
+// @param modelName {sym} The spaCy model/language to use. 
 //   This must already be installed.
 // @param fieldNames {sym[]} The fields the parser should return
 // @returns {func} A function to parse text
-parser.newParser:{[modelName;fieldNames]
+newParser:{[modelName;fieldNames]
   options:{distinct x,raze parser.i.depOpts x}/[fieldNames];
   disabled:`ner`tagger`parser except options;
   model:parser.i.newSubParser[modelName;options;disabled];
@@ -187,3 +222,4 @@ parser.newParser:{[modelName;fieldNames]
   stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
   parser.i.runParser[pyParser;fieldNames;options;stopWords]
   }
+
