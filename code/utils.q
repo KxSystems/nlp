@@ -54,12 +54,6 @@ i.matrixFromRaggedList:{m+flip m:((til count x)#'0.),'.5,'x}
 i.stopUniPOS:asc`ADP`PART`AUX`CONJ`DET`SYM`NUM`PRON`SCONJ
 i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,`$("PRP$";"WP$";"$") /add in ` for symbols
 
-// Parse urls
-p)from urllib.parse import urlparse
-p)import re
-p)seReg=re.compile('([a-z0-9]+:)?//')
-i.parseURLs:.p.eval["lambda url: urlparse(url if seReg.match(url) else 'http://' + url)";<]
-
 // Calc cosine similarity between doc and entire corpus
 i.compareDocToCorpus:{[keywords;idx]compareDocs[keywords idx]each(idx+1)_ keywords}
 
