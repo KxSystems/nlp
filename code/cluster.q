@@ -223,10 +223,9 @@ cluster.groupByCentroids:{[centroids;docs]
 // @fileoverview Uses the Radix clustering algorithm and bins are taken from 
 //   the top 3 terms of each document
 // @param docs {tab;dict[]} A list of documents, or document keywords
-// @param numOfClusters {long} The number of clusters desired, though fewer 
-//   may be returned.
-//   This must be fairly high to cover a substantial amount of the corpus, as 
-//   clusters are small
+// @param numOfClusters {long} The number of clusters desired, though fewer may
+//   be returned. This must be fairly high to cover a substantial amount of the
+//   corpus, as clusters are small
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.radix:{[docs;n]
   docs:cluster.i.asKeywords docs;
@@ -254,9 +253,8 @@ cluster.radix:{[docs;n]
 //   significant term
 // @param docs {tab;dict[]} A list of documents, or document keywords
 // @param numOfClusters {long} The number of clusters desired, though fewer may
-//   be returned.
-//   This must be fairly high to cover a substantial amount of the corpus, as 
-//   clusters are small
+//   be returned. This must be fairly high to cover a substantial amount of the
+//   corpus, as clusters are small
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.fastRadix:{[docs;n]
   docs:cluster.i.asKeywords docs;
