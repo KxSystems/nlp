@@ -3,7 +3,7 @@
 // @private
 // @kind function
 // @category nlpRegexUtility
-// @fileoverview Import regex modul from python
+// @fileoverview Import the regex module from python
 regex.i.re:.p.import`re
 
 // @private
@@ -11,7 +11,7 @@ regex.i.re:.p.import`re
 // @category nlpRegexUtility
 // @fileoverview Check if a pattern occurs in the text
 // @params patterns {<} A regex pattern as an embedPy object
-// @params text {str} A piece of text t
+// @params text {str} A piece of text
 // @returns {bool} Indicate whether or not the pattern is present in the text 
 regex.i.check:{[patterns;text]
   i.bool[patterns[`:search]text]`
@@ -77,8 +77,8 @@ regex.i.patterns.postalOrZipCode:"\\b(\\d{5}|[a-z]\\d[a-z] ?\\d[a-z]\\d)\\b"
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
-// @fileoverview A string of date seperator characters
-regex.i.patterns.dateSeperate:"[\\b(of |in )\\b\\t .,-/\\\\]+"
+// @fileoverview A string of date separator characters
+regex.i.patterns.dateSeparate:"[\\b(of |in )\\b\\t .,-/\\\\]+"
 
 // @private
 // @kind data
@@ -153,16 +153,16 @@ regex.i.patterns.yearMonthDayList:"(",sv["|";
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
-// @fileoverview A string of year/month characters along with date seperators
-regex.i.patterns.yearMonth:"(",sv[regex.i.patterns.dateSeperate;
+// @fileoverview A string of year/month characters along with date separators
+regex.i.patterns.yearMonth:"(",sv[regex.i.patterns.dateSeparate;
   2#enlist regex.i.patterns.yearMonthList],")"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @fileoverview A string of year/month/date characters along with date
-//   seperators
-regex.i.patterns.yearMonthDay:"(",sv[regex.i.patterns.dateSeperate;
+//   separators
+regex.i.patterns.yearMonthDay:"(",sv[regex.i.patterns.dateSeparate;
   3#enlist regex.i.patterns.yearMonthDayList],")"
 
 // @kind function
@@ -183,7 +183,7 @@ regex.compile:{[patterns;ignoreCase]
 // @params patterns {<} A regex pattern as an embedPy object
 // @params text {str} A piece of text
 // @returns {null;str[]} If the pattern is not present in the text a null
-//   is returned. Otehrwise, the pattern along with the index where the 
+//   is returned. Otherwise, the pattern along with the index where the 
 //   pattern begins and ends is returned
 regex.matchAll:.p.eval["lambda p,t:[[x.group(),x.start(),x.end()]",
   "for x in p.finditer(t)]";<]
