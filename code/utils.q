@@ -57,4 +57,13 @@ i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,`$("PRP$";
 // Calc cosine similarity between doc and entire corpus
 i.compareDocToCorpus:{[keywords;idx]compareDocs[keywords idx]each(idx+1)_ keywords}
 
-
+// @private
+// @kind function
+// @category nlpUtility
+// @fileoverview Get the count of terms in a corpus
+// @params corpus {tab} A corpus of documents
+// @returns {dict} The count of terms in the corpus
+i.getTermCount:{[corpus]
+  tokens:corpus[`tokens]@'where each not corpus`isStop;
+  i.fastSum{1+log count each group x}each tokens
+  }

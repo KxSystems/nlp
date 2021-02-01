@@ -2,11 +2,35 @@
 
 // Date-Time
 
-// Find all dates : list of 5-tuples (startDate; endDate; dateText; startIndex; 1+endIndex)
-findDates:tm.findDates
+// @kind function
+// @category nlp
+// @fileoverview Find any times in a string
+// @param text {str} A document, potentially containing many times
+// @returns {any[]} A list of tuples for each time containing
+//   (q-time; timeText; startIndex; 1+endIndex)
+findTimes:{[text]
+  timeText:regex.matchAll[regex.objects.time;text];
+  parseTime:tm.i.parseTime each timeText[;0];
+  time:parseTime,'timeText;
+  time where time[;0]<24:01
+  }
 
-// Find all times : list of 4-tuples (time; timeText; startIndex; 1+endIndex)
-findTimes:tm.findTimes
+// @kind function
+// @category nlp
+// @fileoverview Find all the dates in a document
+// @param text {str} A document, potentially containing many dates
+// @returns {any[]} A list of tuples for each time containing 
+//   (startDate; endDate; dateText; startIndex; 1+endIndex)
+findDates:{[text]
+  ym:regex.matchAll[regex.objects.yearMonth;text];
+  ymd:regex.matchAll[regex.objects.yearMonthDay;text];
+  convYMD:tm.i.convYearMonthDay each ymd[;0];
+  dates:tm.i.rmNull convYMD,'ymd;
+  if[count dates;ym@:where not any ym[;1] within/: dates[; 3 4]];
+  convYM:tm.i.convYearMonth each ym[;0];
+  dates,:tm.i.rmNull convYM,'ym;
+  dates iasc dates[;3]
+  }
 
 // Sentiment
 
@@ -15,40 +39,77 @@ sentiment:sent.score
 
 // Comparing docs/terms
 
-// Give 2 dicts of each term's affinity to each corpus
-// Algorithm from Rayson, Paul, and Roger Garside. "Comparing corpora using frequency profiling."
-// Proceedings of the workshop on Comparing Corpora. Association for Computational Linguistics, 2000
-compareCorpora:{[corp1;corp2]
-  if[(not count corp1)|(not count corp2);:((`$())!();(`$())!())];
-  getTermCount:{[corp]
-    i.fastSum{1+log count each group x}each corp[`tokens]@'where each not corp`isStop};
-  totalWordCountA:sum termCountA:getTermCount corp1;
-  totalWordCountB:sum termCountB:getTermCount corp2;
+// @fileOverview Calculates the affinity between terms in two corpus' 
+//   Algorithm from Rayson, Paul, and Roger Garside. "Comparing corpora using
+//   frequency profiling."
+//   Proceedings of the workshop on Comparing Corpora. Association for 
+//   Computational Linguistics, 2000
+// @param corpus1 {tab} A corpus of documents
+// @param corpus2 {tab} A corpus of documents  
+// @returns {dict[]} A dictionary of terms and their affinity for corpus2 
+//   over corpus1
+compareCorpora:{[corpus1;corpus2]
+  if[not min count each (corpus1;corpus2);:((`$())!();(`$())!())];
+  termCountA:i.getTermCount corpus1;
+  termCountB:i.getTermCount corpus2;
+  totalWordCountA:sum termCountA;
+  totalWordCountB:sum termCountB;
   // The expected termCount of each term in each corpus
   coef:(termCountA+termCountB)%(totalWordCountA+totalWordCountB);
   expectedA:totalWordCountA*coef;
   expectedB:totalWordCountB*coef;
   // Return the differences between the corpora
-  (desc termCountA*log termCountA%expectedA;desc termCountB*log termCountB%expectedB)}
+  dict1:desc termCountA*log termCountA%expectedA;
+  dict2:desc termCountB*log termCountB%expectedB;
+  (dict1;dict2)
+  }
 
-// Calc cosine similarity of two docs
-compareDocs:{cosineSimilarity .(x;y)@\:distinct raze key each(x;y)}
+// @fileOverview Calculates the cosine similarity of two documents
+// @param keyword1 {dict} A document's keywords
+// @param keyword2 {dict} A document's keywords
+// @returns {float} The cosine similarity of two documents
+compareDocs:{[keyword1;keyword2]
+  keywords:distinct raze key each(keyword1;keyword2);
+  cosineSimilarity .(keyword1;keyword2)@\:keywords
+  }
 
-// Compare similarity of 2 vectors
-cosineSimilarity:{sum[x*y]%(sqrt sum x*x)*sqrt sum y*y}
+// @fileOverview A function for comparing the similarity of two vectors
+// @param vec1 {float[]} A vector of values
+// @param vec2 {float[]} A vector of values
+// @returns {float} between -1f and 1f inclusive
+cosineSimilarity:{[vec1;vec2]
+  sqrtSum1:sqrt sum vec1*vec1;
+  sqrtSum2:sqrt sum vec2*vec2;
+  sum[vec1*vec2]%(sqrtSum1)*sqrtSum2
+  }
 
-// How much each term contributes to the cosine similarity
+// @fileOverview Calculate how much each term contributes to the 
+//   cosine similarity
+// @param doc1 {dict} A dictionary of keywords and their similarity scores
+// @param doc2 {dict} A dictionary of keywords and their similarity scores
+// @returns {dict} A dictionary of how much of the similarity score each 
+//   token is responsible for
 explainSimilarity:{[doc1;doc2]
   alignedKeys:inter[key doc1;key doc2];
   doc1@:alignedKeys;
   doc2@:alignedKeys;
   product:(doc2%i.magnitude doc1)*(doc2%i.magnitude doc2);
-  desc alignedKeys!product%sum product}
+  desc alignedKeys!product%sum product
+  }
 
-// Cosine similarity of doc and centroid
+// @fileOverview Calculates the cosine similarity of a document and a centroid,
+//   subtracting the document from the centroid.
+//   This does the subtraction after aligning the keys so that terms not in 
+//   the centroid don't get subtracted.
+//   This assumes that the centroid is the sum, not the avg, of the documents
+//   in the cluster
+// @param centroid {dict} The sum of all documents in a cluster
+// @param doc {dict} A document in the cluster
+// @returns {float} The cosine similarity of two documents
 compareDocToCentroid:{[centroid;doc]
   doc@:alignedKeys:distinct key[centroid],key doc;
-  cosineSimilarity[doc;centroid[alignedKeys]-doc]}
+  cosineSimilarity[doc;centroid[alignedKeys]-doc]
+  }
 
 // Calc cosine similarity between doc and entire corpus
 compareDocToCorpus:i.compareDocToCorpus
