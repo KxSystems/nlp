@@ -27,7 +27,7 @@ sent.i.tokenPattern:{
 //   (won't work for general purpose tokenizing)
 // @param text {str} The text to be tokenized
 // @returns {sym[]} The tokens of the text 
-//  (each word/emoticon ends up in its own token)
+//   (each word/emoticon ends up in its own token)
 sent.i.tokenize:{[text]
   `$regex.matchAll[sent.i.tokenPattern;text][;0]
   }
@@ -56,7 +56,7 @@ sent.i.amplifyQM:{[text]
   (0 0 .36 .54 .96)4&sum"?"=text
   }
 
-// @private
+// @private 
 // @kind data
 // @category nlpSentUtility
 // @fileoverview Positive booster words. This increases positive valences
