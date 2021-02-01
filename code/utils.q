@@ -11,7 +11,7 @@ i.bool:.p.import[`builtins]`:bool
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview A fast way to sum a list of dictionaries in 
+// @fileoverview A fast way to sum a list of dictionaries in 
 //   certain cases
 // @param iter {long} The number of iterations
 // @param dict {dict[]} A list of dictionaries
@@ -41,8 +41,8 @@ i.fillEmptyDocs:{[docs]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Given a monotonically increasing list of integral numbers,
-//  this finds any runs of consecutive numbers
+// @fileoverview Given a monotonically increasing list of integral numbers,
+//   this finds any runs of consecutive numbers
 // @param array {num[]} Array of values 
 // @returns {long[][]} A list of runs of consecutive indices
 i.findRuns:{[array]
@@ -74,7 +74,7 @@ i.maxIndex:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Calculate the harmonic mean
+// @fileoverview Calculate the harmonic mean
 // @param array {num[]} Array of values 
 // @returns {float} The harmonic mean of the input
 i.harmonicMean:{[array]
@@ -84,7 +84,7 @@ i.harmonicMean:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Calculate a vector's magnitude
+// @fileoverview Calculate a vector's magnitude
 // @param array {num[]} Array of values 
 // @returns {float} The magnitude of the vector
 i.magnitude:{[array]
@@ -94,7 +94,7 @@ i.magnitude:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Normalize a list or dictionary so the highest value is 1f
+// @fileoverview Normalize a list or dictionary so the highest value is 1f
 // @param vals {float[];dict} A list or dictionary of numbers
 // @returns {float[];dict} The input, normalized
 i.normalize:{[vals]
@@ -104,7 +104,7 @@ i.normalize:{[vals]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Takes the largest N values
+// @fileoverview Takes the largest N values
 // @param n {long} The number of elements to take
 // @param vals {any[]} A list of values
 // @returns {any[]} The largest N values
@@ -115,7 +115,7 @@ i.takeTop:{[n;vals]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Calculate the Jaro similarity score of two strings
+// @fileoverview Calculate the Jaro similarity score of two strings
 // @param str1 {str;str[]} A string of text
 // @param str2 {str;str[]} A string of text
 // @returns {Float} The similarity score of two strings
@@ -139,7 +139,7 @@ i.jaro:{[str1;str2]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Calculate the Jaro-Winkler distance of two strings
+// @fileoverview Calculate the Jaro-Winkler distance of two strings
 // @param str1 {str;str[]} A string of text
 // @param str2 {str;str[]} A string of text
 // @returns {float} The Jaro-Winkler of two strings, between 0 and 1
@@ -161,7 +161,7 @@ i.jaroWinkler:{[str1;str2]
 //   an upper triangular matrix where the diagonal values are all 0.
 //   eg. (2 3 4f; 5 6f; 7f) for a 4x4 matrix
 // @returns {float[][]} An n x n two dimensional array
-//  The input, mirrored across the diagonal, with all diagonal values being 1
+//   The input, mirrored across the diagonal, with all diagonal values being 1
 i.matrixFromRaggedList:{[raggedList]
   // Pad the list with 0fs to make it an array,and set the diagonal values to 
   // .5 which become 1 when the matrix is added to its flipped value
@@ -180,7 +180,7 @@ i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
 // @private
 // @kind function
 // @category nlpUtility
-// @fileOverview Find the cosine similarity between document and the 
+// @fileoverview Find the cosine similarity between document and the 
 //   other documents in the corpus
 // @param keywords {dict[]} A list of dictionaries of keywords and coefficients
 // @param idx {num} The index of the feature vector to compare to the rest of 
