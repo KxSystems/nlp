@@ -67,3 +67,19 @@ i.getTermCount:{[corpus]
   tokens:corpus[`tokens]@'where each not corpus`isStop;
   i.fastSum{1+log count each group x}each tokens
   }
+
+// @kind function
+// @category nlp
+// @fileoverview Calculate the probability of words appearing in a text
+// @param tokens {sym[]} The tokens in the text
+// @param occurance {dict} The total times a token appears in the text
+// @param token {sym} A single token
+// @param nextToken {sym} The next token in the list of tokens
+// @returns {dict} The probability that the secondary word in the sequence 
+//   follows the primary word.
+i.biGram:{[tokens;occurance;token;nextToken]
+  returnKeys:enlist(token;nextToken);
+  countToken:count where nextToken=tokens 1+where token=tokens;
+  returnVals:countToken%occurance[token];
+  returnKeys!enlist returnVals
+  }
