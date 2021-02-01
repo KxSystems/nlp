@@ -65,11 +65,33 @@ compareDocToCentroid:{[centroid;doc]
   doc@:alignedKeys:distinct key[centroid],key doc;
   cosineSimilarity[doc;centroid[alignedKeys]-doc]}
 
-// Calc cosine similarity between doc and entire corpus
-compareDocToCorpus:i.compareDocToCorpus
+// @kind function
+// @category nlp
+// @fileoverview Find the cosine similarity between one document and all the 
+//   other documents of the corpus
+// @param keywords {dict[]} A list of dictionaries of keywords and coefficients
+// @param idx {num} The index of the feature vector to compare to the rest of 
+//   the corpus
+// @returns {float[]} The document's significance to the rest of the corpus
+compareDocToCorpus:{[keywords;idx]
+  compareDocs[keywords idx]each(idx+1)_ keywords
+  }
 
-// Jaro-Winkler distance between 2 strings
-jaroWinkler:{i.jaroWinkler[lower x;lower y]}
+// @kind function
+// @category nlp
+// @fileoverview Calculate the Jaro-Winkler distance of two strings
+// @param str1 {str;str[]} A string of text
+// @param str2 {str;str[]} A string of text
+// @returns {float} The Jaro-Winkler of two strings, between 0 and 1
+jaroWinkler:{[str1;str2]
+  str1:lower str1;
+  str2:lower str2;
+  jaroScore:i.jaro[str1;str2];
+  jaroScore+$[0.7<jaroScore;
+    (sum mins(4#str1)~'4#str2)*.1*1-jaroScore;
+    0
+    ]
+  }
 
 // Feature Vectors
 
@@ -149,8 +171,12 @@ loadTextFromDir:{[fp]
   path:{[fp]raze$[-11=type k:key fp:hsym fp;fp;.z.s each` sv'fp,'k]}`$fp;
   ([]fileName:(` vs'path)[;1];path;text:"\n"sv'read0 each path)}
 
-// Get all sentences for a doc
-getSentences:i.getSentences
+// @fileOverview Get all the sentences for a document
+// @param doc {dictionary} A document record
+// @returns {str[]} All the sentences from a document
+getSentences:{[doc]
+  (sublist[;doc`text]deltas@)each doc`sentChars
+  }
 
 // n-gram 
 ngram:{[corpus;n]
