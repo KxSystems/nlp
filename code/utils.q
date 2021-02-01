@@ -139,21 +139,6 @@ i.jaro:{[str1;str2]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Calculate the Jaro-Winkler distance of two strings
-// @param str1 {str;str[]} A string of text
-// @param str2 {str;str[]} A string of text
-// @returns {float} The Jaro-Winkler of two strings, between 0 and 1
-i.jaroWinkler:{[str1;str2]
-  jaroScore:i.jaro[str1;str2];
-  $[0.7<jaroScore;
-    jaroScore+(sum mins(4#str1)~'4#str2)*.1*1-jaroScore;
-    jaroScore
-    ]
-  }
-
-// @private
-// @kind function
-// @category nlpUtility
 // @fileoverview Generating symmetric matrix from triangle (ragged list)
 //   This is used to save time when generating a matrix where the upper 
 //   triangular component is the mirror of the lower triangular component
@@ -176,16 +161,3 @@ i.matrixFromRaggedList:{[raggedList]
 i.stopUniPOS:asc`ADP`PART`AUX`CONJ`DET`SYM`NUM`PRON`SCONJ
 i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
   `$("PRP$";"WP$";"$")
-
-// @private
-// @kind function
-// @category nlpUtility
-// @fileoverview Find the cosine similarity between document and the 
-//   other documents in the corpus
-// @param keywords {dict[]} A list of dictionaries of keywords and coefficients
-// @param idx {num} The index of the feature vector to compare to the rest of 
-//   the corpus
-// @returns {float[]} The document's significance to the rest of the corpus
-i.compareDocToCorpus:{[keywords;idx]
-  compareDocs[keywords idx]each(idx+1)_ keywords
-  }
