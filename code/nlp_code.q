@@ -111,14 +111,6 @@ TFIDF:{[corpus]
 
 TFIDF_tot:{[corpus]desc sum t%'sum each t:TFIDF corpus}
 
-// Parse Data
-
-// Create a new parser using a spaCy model (must already be installed)
-newParser:parser.newParser
-
-// Parse urls to dictionaries
-parseURLs:{`scheme`domainName`path`parameters`query`fragment!i.parseURLs x}
-
 // Exploratory Analysis 
 
 // Find runs of tokens whose POS tags are in the set passed in

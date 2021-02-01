@@ -6,6 +6,7 @@ system"l ",path,"/","nlp.q"
 loadfile`:code/utils.q
 loadfile`:code/regex.q
 loadfile`:code/sent.q
+loadfile`:code/parser.p
 loadfile`:code/parser.q
 loadfile`:code/date_time.q
 loadfile`:code/extract_rtf.p
