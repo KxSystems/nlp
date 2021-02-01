@@ -165,3 +165,30 @@ i.matrixFromRaggedList:{[raggedList]
 i.stopUniPOS:asc`ADP`PART`AUX`CONJ`DET`SYM`NUM`PRON`SCONJ
 i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
   `$("PRP$";"WP$";"$")
+
+// @private
+// @kind function
+// @category nlpUtility
+// @fileoverview Get the count of individual terms in a corpus
+// @params corpus {tab} A corpus of documents
+// @returns {dict} The count of terms in the corpus
+i.getTermCount:{[corpus]
+  tokens:corpus[`tokens]@'where each not corpus`isStop;
+  i.fastSum{1+log count each group x}each tokens
+  }
+
+// @kind function
+// @category nlp
+// @fileoverview Calculate the probability of words appearing in a text
+// @param tokens {sym[]} The tokens in the text
+// @param occurance {dict} The total times a token appears in the text
+// @param token {sym} A single token
+// @param nextToken {sym} The next token in the list of tokens
+// @returns {dict} The probability that the secondary word in the sequence 
+//   follows the primary word.
+i.biGram:{[tokens;occurance;token;nextToken]
+  returnKeys:enlist(token;nextToken);
+  countToken:count where nextToken=tokens 1+where token=tokens;
+  returnVals:countToken%occurance[token];
+  returnKeys!enlist returnVals
+  }

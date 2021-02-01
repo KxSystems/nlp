@@ -174,33 +174,3 @@ tm.i.parseTime:{[text]
 tm.i.rmNull:{[array]
   array where not null array[;0]
   }
-
-// @kind function
-// @category nlpTime
-// @fileoverview Find any times in a string
-// @param text {str} A document, potentially containing many times
-// @returns {any[]} A list of tuples for each time containing
-//   (q-time; timeText; startIndex; 1+endIndex)
-tm.findTimes:{[text]
-  timeText:regex.matchAll[regex.objects.time;text];
-  parseTime:tm.i.parseTime each timeText[;0];
-  time:parseTime,'timeText;
-  time where time[;0]<24:01
-  }
-
-// @kind function
-// @category nlpTime
-// @fileoverview Find all the dates in a document
-// @param text {str} A document, potentially containing many dates
-// @returns {any[]} A list of tuples for each time containing 
-//   (startDate; endDate; dateText; startIndex; 1+endIndex)
-tm.findDates:{[text]
-  ym:regex.matchAll[regex.objects.yearMonth;text];
-  ymd:regex.matchAll[regex.objects.yearMonthDay;text];
-  convYMD:tm.i.convYearMonthDay each ymd[;0];
-  dates:tm.i.rmNull convYMD,'ymd;
-  if[count dates;ym@:where not any ym[;1] within/: dates[; 3 4]];
-  convYM:tm.i.convYearMonth each ym[;0];
-  dates,:tm.i.rmNull convYM,'ym;
-  dates iasc dates[;3]
-  }
