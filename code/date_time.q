@@ -161,7 +161,7 @@ tm.i.dateFormats:(!). flip(
 tm.i.parseTime:{[text]
   numText:vs[" ";text][0]in"1234567890:.";
   time:"T"$text where numText; 
-  amPM:regex.check[;text]each regex.objects`am`pm;
+  amPM:regex.i.check[;text]each regex.objects`am`pm;
   time+$[amPM[0]&12=`hh$time;-1;amPM[1]&12>`hh$time;1;0]*12:00
   }
 
@@ -195,8 +195,8 @@ tm.findTimes:{[text]
 // @returns {any[]} A list of tuples for each time containing 
 //   (startDate; endDate; dateText; startIndex; 1+endIndex)
 tm.findDates:{[text]
-  ym:regex.matchAll[regex.objects.yearmonth;text];
-  ymd:regex.matchAll[regex.objects.yearmonthday;text];
+  ym:regex.matchAll[regex.objects.yearMonth;text];
+  ymd:regex.matchAll[regex.objects.yearMonthDay;text];
   convYMD:tm.i.convYearMonthDay each ymd[;0];
   dates:tm.i.rmNull convYMD,'ymd;
   if[count dates;ym@:where not any ym[;1] within/: dates[; 3 4]];
