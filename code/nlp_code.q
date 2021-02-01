@@ -52,8 +52,8 @@ compareDocToCentroid:{[centroid;doc]
 
 // @kind function
 // @category nlp
-// @fileoverview Find the cosine similarity between document and the 
-//   other documents in the corpus
+// @fileoverview Find the cosine similarity between one document and all the 
+//   other documents of the corpus
 // @param keywords {dict[]} A list of dictionaries of keywords and coefficients
 // @param idx {num} The index of the feature vector to compare to the rest of 
 //   the corpus
@@ -68,13 +68,13 @@ compareDocToCorpus:{[keywords;idx]
 // @param str1 {str;str[]} A string of text
 // @param str2 {str;str[]} A string of text
 // @returns {float} The Jaro-Winkler of two strings, between 0 and 1
-i.jaroWinkler:{[str1;str2]
+jaroWinkler:{[str1;str2]
   str1:lower str1;
   str2:lower str2;
   jaroScore:i.jaro[str1;str2];
-  $[0.7<jaroScore;
-    jaroScore+(sum mins(4#str1)~'4#str2)*.1*1-jaroScore;
-    jaroScore
+  jaroScore+$[0.7<jaroScore;
+    (sum mins(4#str1)~'4#str2)*.1*1-jaroScore;
+    0
     ]
   }
 
