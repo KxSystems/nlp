@@ -29,10 +29,10 @@ regex.i.patterns.specialChars:"[-[\\]{}()*+?.,\\\\^$|#\\s]"
 // @fileoverview A string of special characters
 regex.i.patterns.money:"[$¥€£¤฿]?\\s*((?<![.0-9])([0-9][0-9, ]*(\\.",
   "([0-9]{0,2})?)?|\\.[0-9]{1,2})(?![.0-9]))\\s*((hundred|thousand|million",
-  "|billion|trillion|[KMB])?\\s*([$¥€£¤฿]|dollars?|yen|pounds?|cad|usd|gbp",
-  "|eur))|[$¥€£¤฿]\\s*((?<![.0-9])([0-9][0-9, ]*(\\.([0-9]{0,2})?)?|\\.",
-  "[0-9]{1,2})(?![.0-9]))\\s*((hundred|thousand|million|billion|trillion|",
-  "[KMB])\\s*([$¥€£¤฿]|dollars?|yen|pounds?|cad|usd|gbp|eur)?)?"
+  "|billion|trillion|[KMB])?\\s*([$¥€£¤฿]|dollars?|yen|pounds?|cad|usd|",
+  "gbp|eur))|[$¥€£¤฿]\\s*((?<![.0-9])([0-9][0-9, ]*(\\.([0-9]{0,2})?)?|",
+  "\\.[0-9]{1,2})(?![.0-9]))\\s*((hundred|thousand|million|billion|",
+  "trillion|[KMB])\\s*([$¥€£¤฿]|dollars?|yen|pounds?|cad|usd|gbp|eur)?)?"
 
 
 // @private
