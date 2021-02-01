@@ -10,8 +10,23 @@ findTimes:tm.findTimes
 
 // Sentiment
 
-// Calculate sentiment of sentence of short message
-sentiment:sent.score
+// @kind function
+// @category nlp
+// @fileoverview Calculate the sentiment of a sentence of short message, 
+//   such as a tweet
+// @param text {str} The text to score
+// @returns {dict} The score split up into compound, positive, negative and 
+//   neutral components
+sentiment:{[text]
+  valences:sent.i.lexicon tokens:lower rawTokens:sent.i.tokenize text;
+  isUpperCase:(rawTokens=upper rawTokens)& rawTokens<>tokens;
+  upperIndices:where isUpperCase & not all isUpperCase;
+  valences[upperIndices]+:sent.i.ALLCAPS_INCR*signum valences upperIndices;
+  valences:sent.i.applyBoosters[tokens;isUpperCase;valences];
+  valences:sent.i.negationCheck[tokens;valences];
+  valences:sent.i.butCheck[tokens;valences];
+  sent.i.scoreValence[0f^valences;text]
+  }
 
 // Comparing docs/terms
 
