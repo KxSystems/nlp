@@ -3,7 +3,7 @@
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Create regex used for tokenizing
+// @fileoverview Create a regex patterns used for tokenization
 // @returns {<} The compiled regex object
 sent.i.tokenPattern:{
   rightFacingEmoticons:"[<>]?[:;=8][\\-o\\*\\']?[\\)\\]\\(\\[dDpP/\\:\\}\\{@",
@@ -93,7 +93,8 @@ sent.i.ALLCAPS_INCR:.733
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview A list of all possible types of boosters
+// @fileoverview A dictionary mapping all possible boosters
+//   to their associated values
 sent.i.Boosters:(!). flip(sent.i.posBoosters,\:sent.i.BOOSTER_INCR),
   (sent.i.negBoosters,\:neg sent.i.BOOSTER_INCR)
 
