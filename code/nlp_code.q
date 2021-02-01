@@ -134,8 +134,12 @@ loadTextFromDir:{[fp]
   path:{[fp]raze$[-11=type k:key fp:hsym fp;fp;.z.s each` sv'fp,'k]}`$fp;
   ([]fileName:(` vs'path)[;1];path;text:"\n"sv'read0 each path)}
 
-// Get all sentences for a doc
-getSentences:i.getSentences
+// @fileOverview Get all the sentences for a document
+// @param doc {dictionary} A document record
+// @returns {str[]} All the sentences from a document
+getSentences:{[doc]
+  (sublist[;doc`text]deltas@)each doc`sentChars
+  }
 
 // n-gram 
 ngram:{[corpus;n]
