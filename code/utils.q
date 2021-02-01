@@ -13,7 +13,8 @@ i.bool:.p.import[`builtins]`:bool
 // @category nlpUtility
 // @fileoverview A fast way to sum a list of dictionaries in 
 //   certain cases
-// @param iter {long} The number of iterations
+// @param iter {long} The number of iterations. Note that within this
+//   library iter is set explicitly to 2 for all present invocations
 // @param dict {dict[]} A list of dictionaries
 // @returns {dict} The dictionary values summed together
 i.fastSum:{[iter;dict]
@@ -23,7 +24,7 @@ i.fastSum:{[iter;dict]
   // adds those groups.
   dictGroup:(ceiling sqrt count dict)cut dict;
   sum$[iter;.z.s iter-1;sum]each dictGroup
-  }2
+  }[2]
 
 // @private
 // @kind function
@@ -54,7 +55,8 @@ i.findRuns:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Index of minimum element of a list
+// @fileoverview Index of the first occurrence of the minimum
+//   value of an array
 // @param array {num[]} Array of values 
 // @return {num} The index of the minimum element of the array
 i.minIndex:{[array]
@@ -64,7 +66,8 @@ i.minIndex:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Index of maximum element of a list
+// @fileoverview Index of the first occurrence of the maximum
+//   value of the array
 // @param array {num[]} Array of values 
 // @return {num} The index of the maximum element of the array
 i.maxIndex:{[array]
