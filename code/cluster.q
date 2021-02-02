@@ -284,7 +284,7 @@ cluster.MCL:{[docs;minimum;sample]
   idx:$[sample;(neg"i"$sqrt count docs)?count docs;til count docs];
   keywords:docs idx;
   n:til count keywords;
-  similarities:i.matrixFromRaggedList i.compareDocToCorpus[keywords]each n;
+  similarities:i.matrixFromRaggedList compareDocToCorpus[keywords]each n;
   // Find all the clusters
   clusters:cluster.i.similarityMatrix similarities>=minimum;
   clustersOfOne:1=count each clusters;

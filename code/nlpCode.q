@@ -36,7 +36,7 @@ findDates:{[text]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculate the sentiment of a sentence of short message, 
+// @fileoverview Calculate the sentiment of a sentence or short message, 
 //   such as a tweet
 // @param text {str} The text to score
 // @returns {dict} The score split up into compound, positive, negative and 
@@ -56,14 +56,14 @@ sentiment:{[text]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculates the affinity between terms in two corpus' 
-//   Algorithm from Rayson, Paul, and Roger Garside. "Comparing corpora using
-//   frequency profiling."
+// @fileoverview Calculates the affinity between terms in two corpus' using
+//   an Algorithm from Rayson, Paul and Roger Garside.
+//   "Comparing corpora using frequency profiling."
 //   Proceedings of the workshop on Comparing Corpora. Association for 
 //   Computational Linguistics, 2000
 // @param corpus1 {tab} A corpus of documents
 // @param corpus2 {tab} A corpus of documents  
-// @returns {dict[]} A dictionary of terms and their affinity for corpus2 
+// @returns {dict[]} A dictionary of terms and their affinities for corpus2 
 //   over corpus1
 compareCorpora:{[corpus1;corpus2]
   if[not min count each (corpus1;corpus2);:((`$())!();(`$())!())];
@@ -97,7 +97,8 @@ compareDocs:{[keyword1;keyword2]
 // @fileoverview A function for comparing the similarity of two vectors
 // @param vec1 {float[]} A vector of values
 // @param vec2 {float[]} A vector of values
-// @returns {float} Similarity score between -1f and 1f inclusive
+// @returns {float} Similarity score between -1f and 1f inclusive, 1 being
+//   perfectly similar, -1 being perfectly dissimilar
 cosineSimilarity:{[vec1;vec2]
   sqrtSum1:sqrt sum vec1*vec1;
   sqrtSum2:sqrt sum vec2*vec2;
@@ -137,11 +138,33 @@ compareDocToCentroid:{[centroid;doc]
   cosineSimilarity[doc;vec]
   }
 
-// Calc cosine similarity between doc and entire corpus
-compareDocToCorpus:i.compareDocToCorpus
+// @kind function
+// @category nlp
+// @fileoverview Find the cosine similarity between one document and all the
+//   other documents of the corpus
+// @param keywords {dict[]} A list of dictionaries of keywords and coefficients
+// @param idx {num} The index of the feature vector to compare to the rest of
+//   the corpus
+// @returns {float[]} The document's significance to the rest of the corpus
+compareDocToCorpus:{[keywords;idx]
+  compareDocs[keywords idx]each(idx+1)_ keywords
+  }
 
-// Jaro-Winkler distance between 2 strings
-jaroWinkler:{i.jaroWinkler[lower x;lower y]}
+// @kind function
+// @category nlp
+// @fileoverview Calculate the Jaro-Winkler distance of two strings
+// @param str1 {str;str[]} A string of text
+// @param str2 {str;str[]} A string of text
+// @returns {float} The Jaro-Winkler of two strings, between 0 and 1
+jaroWinkler:{[str1;str2]
+  str1:lower str1;
+  str2:lower str2;
+  jaroScore:i.jaro[str1;str2];
+  jaroScore+$[0.7<jaroScore;
+    (sum mins(4#str1)~'4#str2)*.1*1-jaroScore;
+    0
+    ]
+  }
 
 // Feature Vectors
 
@@ -172,7 +195,7 @@ findRelatedTerms:{[corpus;term]
 // @kind function
 // @category nlp
 // @fileoverview Find runs containing term where each word has above average 
-//   co-ocurrance with term
+//   co-ocurrance with a provided term
 // @param corpus {tab} A corpus of documents
 // @param term {sym} The term to extract phrases around
 // @returns {dict} Phrases as the keys, and their relevance as the values
@@ -194,9 +217,9 @@ extractPhrases:{[corpus;term]
 // @category nlp
 // @fileoverview Given an input which is conceptually a single document,
 //   such as a book, this will give better results than TF-IDF.
-//   This algorithm is explained in the paper
-//   Carpena, P., et al. "Level statistics of words: Finding keywords in 
-//   literary texts and symbolic sequences."
+//   This algorithm is explained in the paper Carpena, P., et al.
+//   "Level statistics of words: Finding keywords in literary texts
+//    and symbolic sequences."
 //   Physical Review E 79.3 (2009): 035102.
 // @param docs {tab} A collection of documents 
 // @returns {dict} Where the keys are keywords as symbols, and the values are 
@@ -220,19 +243,19 @@ keywordsContinuous:{[docs]
 
 // @kind function
 // @category nlp
-// @fileoverview Find the TFIDF scores for all terms in all documents
+// @fileoverview Find the TF-IDF scores for all terms in all documents
 // @param corpus {tab;sym[][]} A table of documents, or a list of token lists
-// @returns {dict[]} For each document, a dictionary with the tokens as keys, 
-//   and relevance as values 
+// @returns {dict[]} For each document, a dictionary with the tokens as keys,
+//   and relevance as values
 TFIDF:{[corpus]
   nums:corpus[`tokens]like\:"[0-9]*";
   tokens:corpus[`tokens]@'where each not corpus[`isStop]|nums;
   words:distinct each tokens;
-  // The frequencies of each token within the document
-  tab:{x!{sum[x in y]%count x}[y]each x}'[words;tokens];
+  // The term frequency of each token within the document
+  TF:{x!{sum[x in y]%count x}[y]each x}'[words;tokens];
   // Calculate the inverse document frequency
   IDF:1+log count[tokens]%{sum{x in y}[y]each x}[tokens]each words;
-  tab*IDF
+  TF*IDF
   }
 
 // Exploratory Analysis 
@@ -240,10 +263,12 @@ TFIDF:{[corpus]
 // @kind function
 // @category nlp
 // @fileoverview Find runs of tokens whose POS tags are in the set passed in
-// @param tagType {sym} `uniPOS or `pennPOS
+// @param tagType {sym} `uniPOS or `pennPOS (Universal or Penn Part-of-Speech)
 // @param tags {sym;sym[]} One or more POS tags
 // @param doc {dict} A single document
-// @returns {(str;long)} The text of the run, with the index of the first token
+// @returns {(str;long)} Two item list containing
+//   1. The text of the run as a symbol vector
+//   2. The index associated with the first token
 findPOSRuns:{[tagType;tags;doc]
   matchingTag:doc[tagType]in tags;
   start:where 1=deltas matchingTag;
@@ -255,8 +280,8 @@ findPOSRuns:{[tagType;tags;doc]
 
 // @kind function
 // @category nlp
-// @fileoverview Determine the probability of a word appearing next in a 
-//   sequence of words
+// @fileoverview Determine the probability of one word following another
+//   in a sequence of words
 // @param corpus {tab} A corpus of documents
 // @returns {dict} The probability that the secondary word in the sequence 
 //   follows the primary word.
@@ -283,10 +308,10 @@ findRegex:{[text;expr]
 
 // @kind function
 // @category nlp
-// @fileoverview Remove any ascii characters from a text
+// @fileoverview Remove any non-ascii characters from a text
 // @param text {str} A string of text
-// @returns {str} Ascii characters removed from the text
-removeAscii:{[text]
+// @returns {str} Non-ascii characters removed from the text
+removeNonAscii:{[text]
   text where text within (0;127)
   }
 
@@ -307,7 +332,8 @@ removeCustom:{[text;char]
 // @fileoverview Remove and replace certain characters from a string of text
 // @param text {str} A string of text
 // @param char {str[]} Characters or expressions to be removed from the text 
-// @param replace {str} The character which will replace the removed character
+// @param replace {str} The characters which will replace the removed
+//   characters
 removeMain:{[text;char;replace]
   {x:ssr[x;y;z];x}[;;replace]/[text;char]
   }
@@ -333,8 +359,12 @@ loadTextFromDir:{[filepath]
   ([]fileName:(` vs'path)[;1];path;text:"\n"sv'read0 each path)
   }
 
-// Get all sentences for a doc
-getSentences:i.getSentences
+// @fileOverview Get all the sentences for a document
+// @param doc {dictionary} A document record
+// @returns {str[]} All the sentences from a document
+getSentences:{[doc]
+  (sublist[;doc`text]deltas@)each doc`sentChars
+  }
 
 // @kind function
 // @category nlp

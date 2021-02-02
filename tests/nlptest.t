@@ -93,10 +93,10 @@ getSentences[first sentenceParser enlist"This is my sentence"]~enlist "This is m
 (getSentences first sentenceParser enlist "There's no train to Guysborough. Though I know there'll be one in time")~("There's no train to Guysborough."; "Though I know there'll be one in time")
 truncate:{[precision; x]coefficient: 10 xexp precision;reciprocal[coefficient]*`long$coefficient*x}
 /jaroWinkler
-all(.961~truncate[3] i.jaroWinkler["martha";"marhta"];.840~truncate[3] i.jaroWinkler["dwayne"; "duane"];.813~truncate[3] i.jaroWinkler["dixon";"dicksonx"];.743~truncate[3] i.jaroWinkler["johnson"; "jannsen"];.562~truncate[3] i.jaroWinkler["johnson";"jannsenberg"];.906~truncate[3] i.jaroWinkler["aahahahahahahhaahah"; "ahahahahhahahahahaha"])   
-all(0f~i.jaroWinkler["benjamin";enlist"z"];0f~i.jaroWinkler["benjamin";enlist"a"])
-all(0f~i.jaroWinkler["";enlist"a"];0f~i.jaroWinkler["ben";""])
-.75~i.jaroWinkler["abcd"; enlist "b"]
+all(.961~truncate[3] jaroWinkler["martha";"marhta"];.840~truncate[3] jaroWinkler["dwayne"; "duane"];.813~truncate[3] jaroWinkler["dixon";"dicksonx"];.743~truncate[3] jaroWinkler["johnson"; "jannsen"];.562~truncate[3] jaroWinkler["johnson";"jannsenberg"];.906~truncate[3] jaroWinkler["aahahahahahahhaahah"; "ahahahahhahahahahaha"])   
+all(0f~jaroWinkler["benjamin";enlist"z"];0f~jaroWinkler["benjamin";enlist"a"])
+all(0f~jaroWinkler["";enlist"a"];0f~jaroWinkler["ben";""])
+.75~jaroWinkler["abcd"; enlist "b"]
 p:newParser[`en; `tokens`isStop];
 corpus:p text;       
 (()!())~keywordsContinuous 0#corpus  
@@ -127,7 +127,7 @@ seq[`management`report]>seq[`report`june]
 `en~detectLang["This is a sentence"]
 `de~detectLang["Das ist ein Satz"]
 `fr~detectLang["C'est une phrase"]
-removeAscii["This is ä senteñcê"]~"This is  sentec"
+removeNonAscii["This is ä senteñcê"]~"This is  sentec"
 rmv_list   :("http*";"*,";"*&*";"*[0-9]*")
 removeCustom["https//:google.com & https//:bing.com are 2 search engines!";rmv_list]~"are search engines!"
 removeMain["https//:google.com & https//:bing.com are 2 search engines!";",.:?!/@'\n";""]~"httpsgooglecom & httpsbingcom are 2 search engines"
