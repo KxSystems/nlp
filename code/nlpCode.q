@@ -334,7 +334,7 @@ removeCustom:{[text;char]
 // @param char {str[]} Characters or expressions to be removed from the text 
 // @param replace {str} The characters which will replace the removed
 //   characters
-removeMain:{[text;char;replace]
+removeReplace:{[text;char;replace]
   {x:ssr[x;y;z];x}[;;replace]/[text;char]
   }
 
