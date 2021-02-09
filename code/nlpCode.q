@@ -132,8 +132,8 @@ compareDocs:{[keyword1;keyword2]
 // @returns {float} Similarity score between -1f and 1f inclusive, 1 being
 //   perfectly similar, -1 being perfectly dissimilar
 cosineSimilarity:{[keywords1;keywords2]
-  sqrtSum1:sqrt sum keywords1*vec1;
-  sqrtSum2:sqrt sum keywords2*vec2;
+  sqrtSum1:sqrt sum keywords1*keywords1;
+  sqrtSum2:sqrt sum keywords2*keywords2;
   sum[keywords1*keywords2]%(sqrtSum1)*sqrtSum2
   }
 

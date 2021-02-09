@@ -5,8 +5,8 @@
 // @category nlpClusteringUtility
 // @fileoverview Extract the keywords from a list of documents or keyword
 //   dictionary
-// @param docs {tab;dict[]} A list of documents, or a list of keyword 
-//   dictionaries
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @returns {dict[]} Keyword dictionaries
 cluster.i.asKeywords:{[docs]
   keyWords:$[-9=type docs[0]`keywords;docs;docs`keywords];
@@ -18,7 +18,8 @@ cluster.i.asKeywords:{[docs]
 // @category nlpClusteringUtility
 // @fileoverview Split the document into clusters using kmeans
 // @param iters {long} The number of times to iterate the refining step
-// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @param clusters {long} Cluster indices
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.i.bisect:{[iters;docs;clusters]
@@ -31,7 +32,8 @@ cluster.i.bisect:{[iters;docs;clusters]
 // @kind function
 // @category nlpClusteringUtility
 // @fileoverview Apply k-means clustering to a document
-// @param docs {dict[]} Keywords in documents
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @param clusters {long[]} Cluster indices
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.i.kmeans:{[docs;clusters]
@@ -44,7 +46,8 @@ cluster.i.kmeans:{[docs;clusters]
 // @category nlpClusteringUtility
 // @fileoverview Find nearest neighbor of document
 // @param centroids {dict[]} Centroids as keyword dictionaries
-// @param docs {dict} Document feature vectors
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @returns {long[][]} Document indices 
 cluster.i.findNearestNeighbor:{[centroids;doc]
   similarities:compareDocs[doc] each centroids;
@@ -134,19 +137,18 @@ cluster.i.MCL:{[matrix]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview A clustering algorithm that works like many summarizing 
-//   algorithms, by finding the most representive elements, then subtracting 
-//   them from the centroid, and iterating until the number of clusters has 
-//   been reached
-// @param docs {tab;dict[]} A list of documents, or document keywords
-// @param numOfClusters {long} The number of clusters to return
+// @fileoverview Uses the top ten keywords of each document in order to cluster
+//   similar documents together  
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
+// @param k {long} The number of clusters to return
 // @returns {long[][]} The documents' indices grouped into clusters
-cluster.summarize:{[docs;n]
+cluster.summarize:{[docs;k]
   if[0=count docs;:()];
   docs:i.takeTop[10]each cluster.i.asKeywords docs;
   summary:i.fastSum[docs]%count docs;
   centroids:();
-  do[n;
+  do[k;
     // Find the document that summarizes the corpus best
     // and move that document to the centroid list
     centroids,:nearest:i.maxIndex docs[;i.maxIndex summary];
@@ -160,6 +162,8 @@ cluster.summarize:{[docs;n]
 // @category nlpClustering
 // @fileoverview Get the cohesiveness of a cluster as measured by the mean 
 //   sum of squares error
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @param docs {dict[]} A document's keyword field
 // @returns {float} The cohesion of the cluster
 cluster.MSE:{[docs]
@@ -178,7 +182,8 @@ cluster.MSE:{[docs]
 // @category nlpClustering
 // @fileoverview The bisecting k-means algorithm which uses k-means to 
 //   repeatedly split the most cohesive clusters into two clusters
-// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @param k {long} The number of clusters to return
 // @param iters {long} The number of times to iterate the refining step
 // @returns {long[][]} The documents' indices, grouped into clusters
@@ -191,7 +196,8 @@ cluster.bisectingKMeans:{[docs;k;iters]
 // @kind function
 // @category nlpClustering
 // @fileoverview k-means clustering for documents
-// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @param k {long} The number of clusters to return
 // @param iters {long} The number of times to iterate the refining step
 // @returns {long[][]} The documents' indices, grouped into clusters
@@ -206,7 +212,8 @@ cluster.kmeans:{[docs;k;iters]
 // @fileoverview Given a list of centroids and a list of documents, match each
 //   document to its nearest centroid
 // @param centroids {dict[]} Centroids as keyword dictionaries
-// @param docs {dict[]} A list of document feature vectors
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @returns {long[][]} Lists of document indices where each list is a cluster
 //   N.B. These don't line up with the number of centroids passed in,
 //   and the number of lists returned may not equal the number of centroids.
@@ -222,12 +229,13 @@ cluster.groupByCentroids:{[centroids;docs]
 // @category nlpClustering
 // @fileoverview Uses the Radix clustering algorithm and bins are taken from 
 //   the top 3 terms of each document
-// @param docs {tab;dict[]} A list of documents, or document keywords
-// @param numOfClusters {long} The number of clusters desired, though fewer may
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
+// @param k {long} The number of clusters desired, though fewer may
 //   be returned. This must be fairly high to cover a substantial amount of the
 //   corpus, as clusters are small
 // @returns {long[][]} The documents' indices, grouped into clusters
-cluster.radix:{[docs;n]
+cluster.radix:{[docs;k]
   docs:cluster.i.asKeywords docs;
   // Bin on keywords, taking the 3 most significant keywords from each document
   // and dropping those that occur less than 3 times  
@@ -243,20 +251,21 @@ cluster.radix:{[docs;n]
   // Take the n*2 highest scoring clusters, as merging will remove some
   // but don't run it on everything, since merging is expensive.
   // This may lead to fewer clusters than expected if a lot of merging happens
-  clusters:clusters sublist[2*n]idesc score;
-  sublist[n]cluster.i.mergeOverlappingClusters/[clusters]
+  clusters:clusters sublist[2*k]idesc score;
+  sublist[k]cluster.i.mergeOverlappingClusters/[clusters]
   }
 
 // @kind function
 // @category nlpClustering
 // @fileoverview Uses the Radix clustering algorithm and bins by the most 
 //   significant term
-// @param docs {tab;dict[]} A list of documents, or document keywords
-// @param numOfClusters {long} The number of clusters desired, though fewer may
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
+// @param k {long} The number of clusters desired, though fewer may
 //   be returned. This must be fairly high to cover a substantial amount of the
 //   corpus, as clusters are small
 // @returns {long[][]} The documents' indices, grouped into clusters
-cluster.fastRadix:{[docs;n]
+cluster.fastRadix:{[docs;k]
   docs:cluster.i.asKeywords docs;
   // Group documents by their most significant term
   grouped:group i.maxIndex each docs;
@@ -269,15 +278,17 @@ cluster.fastRadix:{[docs;n]
   size:i.normalize log count each clusters;
   score:i.harmonicMean each flip(cohesion;size);
   // Return the n highest scoring clusters
-  clusters sublist[n]idesc score
+  clusters sublist[k]idesc score
   }
 
 // @kind function
 // @category nlpClustering
 // @fileoverview Cluster a subcorpus using graph clustering
-// @param docs {tab;dict[]} A list of documents, or document keywords
+// @param docs {tab;dict[]} Contains the documents keywords and their 
+//   associated significance
 // @param minimum {float} The minimum similarity that will be considered
-// @param sample {bool} If this is true, a sample of sqrt(n) documents is used
+// @param sample {bool} If this is true, a sample of sqrt(n) documents is used,
+//   otherwise all documanets are used
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.MCL:{[docs;minimum;sample]
   docs:cluster.i.asKeywords docs;
