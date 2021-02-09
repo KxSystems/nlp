@@ -9,9 +9,9 @@ install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+      wget https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh -O miniconda.sh;
     else
-      wget https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh -O miniconda.sh;
+      wget https://repo.continuum.io/miniconda/Miniconda3-4.5.4-MacOSX-x86_64.sh -O miniconda.sh;
     fi
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
@@ -27,7 +27,7 @@ install:
   - if [[ "x$QLIC_KC" != "x" ]]; then
       echo -n $QLIC_KC |base64 --decode > q/kc.lic;
       pip -q install -r requirements.txt;
-      python -m spacy download en;
+      python -m spacy download en; 
     fi
 beforescript:
   - IMPLEMENTATION=$(if [[ "x$TRAVIS_TAG" == "x" ]]; then echo $TRAVIS_BRANCH-$TRAVIS_COMMIT; else echo $TRAVIS_TAG; fi;)
