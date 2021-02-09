@@ -192,34 +192,3 @@ parser.i.parseURLs:{[url]
     "else 'http://' + url)";
   .p.eval[pyLambda;<]url
   }
-
-// @kind function
-// @category nlpParser
-// @fileOverview Parse URLs into dictionaries containing the
-//   constituent components
-// @param url {str} The URL to decompose into its components
-// @returns {dict} A dictionary containing information about
-//   the scheme, domain name and other URL information
-parseURLs:{[url]
-  urlKeys:`scheme`domainName`path`parameters`query`fragment;
-  urlVals:parser.i.parseURLs url;
-  urlKeys!urlVals
-  }
-
-// @kind function
-// @category nlpParser
-// @fileOverview Create a new parser
-// @param modelName {sym} The spaCy model/language to use. 
-//   This must already be installed.
-// @param fieldNames {sym[]} The fields the parser should return
-// @returns {func} A function to parse text
-newParser:{[modelName;fieldNames]
-  options:{distinct x,raze parser.i.depOpts x}/[fieldNames];
-  disabled:`ner`tagger`parser except options;
-  model:parser.i.newSubParser[modelName;options;disabled];
-  tokenAttrs:parser.i.q2spacy key[parser.i.q2spacy]inter options;
-  pyParser:parser.i.parseText[model;tokenAttrs;options;];
-  stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
-  parser.i.runParser[pyParser;fieldNames;options;stopWords]
-  }
-

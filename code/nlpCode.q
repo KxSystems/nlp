@@ -32,6 +32,38 @@ findDates:{[text]
   dates iasc dates[;3]
   }
 
+// Parsing function
+
+// @kind function
+// @category nlp
+// @fileOverview Parse URLs into dictionaries containing the
+//   constituent components
+// @param url {str} The URL to decompose into its components
+// @returns {dict} Contains information about the scheme, domain name 
+//   and other URL information
+parseURLs:{[url]
+  urlKeys:`scheme`domainName`path`parameters`query`fragment;
+  urlVals:parser.i.parseURLs url;
+  urlKeys!urlVals
+  }
+
+// @kind function
+// @category nlp
+// @fileOverview Create a new parser
+// @param spacyModel {sym} The spaCy model/language to use. 
+//   This must already be installed.
+// @param fieldNames {sym[]} The fields the parser should return
+// @returns {func} A function to parse text
+newParser:{[spacyModel;fieldNames]
+  options:{distinct x,raze parser.i.depOpts x}/[fieldNames];
+  disabled:`ner`tagger`parser except options;
+  model:parser.i.newSubParser[spacyModel;options;disabled];
+  tokenAttrs:parser.i.q2spacy key[parser.i.q2spacy]inter options;
+  pyParser:parser.i.parseText[model;tokenAttrs;options;];
+  stopWords:(`$.p.list[model`:Defaults.stop_words]`),`$"-PRON-";
+  parser.i.runParser[pyParser;fieldNames;options;stopWords]
+  }
+
 // Sentiment
 
 // @kind function
@@ -95,29 +127,29 @@ compareDocs:{[keyword1;keyword2]
 // @kind function
 // @category nlp
 // @fileoverview A function for comparing the similarity of two vectors
-// @param vec1 {float[]} A vector of values
-// @param vec2 {float[]} A vector of values
+// @param keywords1 {dict} Keywords and their significance scores 
+// @param keywords2 {dict} Keywords and their significance scores 
 // @returns {float} Similarity score between -1f and 1f inclusive, 1 being
 //   perfectly similar, -1 being perfectly dissimilar
-cosineSimilarity:{[vec1;vec2]
-  sqrtSum1:sqrt sum vec1*vec1;
-  sqrtSum2:sqrt sum vec2*vec2;
-  sum[vec1*vec2]%(sqrtSum1)*sqrtSum2
+cosineSimilarity:{[keywords1;keywords2]
+  sqrtSum1:sqrt sum keywords1*vec1;
+  sqrtSum2:sqrt sum keywords2*vec2;
+  sum[keywords1*keywords2]%(sqrtSum1)*sqrtSum2
   }
 
 // @kind function
 // @category nlp
 // @fileoverview Calculate how much each term contributes to the 
 //   cosine similarity
-// @param doc1 {dict} A dictionary of keywords and their similarity scores
-// @param doc2 {dict} A dictionary of keywords and their similarity scores
+// @param keywords1 {dict} Keywords and their significance scores 
+// @param keywords2 {dict} Keywords and their significance scores 
 // @returns {dict} A dictionary of how much of the similarity score each 
 //   token is responsible for
-explainSimilarity:{[doc1;doc2]
-  alignedKeys:inter[key doc1;key doc2];
-  doc1@:alignedKeys;
-  doc2@:alignedKeys;
-  product:(doc2%i.magnitude doc1)*(doc2%i.magnitude doc2);
+explainSimilarity:{[keywords1;keywords2]
+  alignedKeys:inter[key keywords1;key keywords2];
+  keywords1@:alignedKeys;
+  keywords2@:alignedKeys;
+  product:(keywords2%i.magnitude keywords1)*(doc2%i.magnitude doc2);
   desc alignedKeys!product%sum product
   }
 
@@ -244,7 +276,7 @@ keywordsContinuous:{[docs]
 // @kind function
 // @category nlp
 // @fileoverview Find the TF-IDF scores for all terms in all documents
-// @param corpus {tab;sym[][]} A table of documents, or a list of token lists
+// @param corpus {tab} A table of documents
 // @returns {dict[]} For each document, a dictionary with the tokens as keys,
 //   and relevance as values
 TFIDF:{[corpus]
@@ -355,12 +387,14 @@ detectLang:{[text]
 loadTextFromDir:{[filepath]
   filepath:hsym`$filepath;
   keyFilepath:key filepath;
-  path:raze$[-11=type keyFilepath;filepath;.z.s each` sv'filepath,'keyFilepath];
+  path:{raze$[11=abs type keyPath:key x;x;.z.s each` sv'x,'keyPath]}filepath;
   ([]fileName:(` vs'path)[;1];path;text:"\n"sv'read0 each path)
   }
 
+// @kind function
+// @category nlp
 // @fileOverview Get all the sentences for a document
-// @param doc {dictionary} A document record
+// @param doc {dict} A document record
 // @returns {str[]} All the sentences from a document
 getSentences:{[doc]
   (sublist[;doc`text]deltas@)each doc`sentChars
