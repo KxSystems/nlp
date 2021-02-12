@@ -5,7 +5,7 @@
 // @kind function
 // @category nlp
 // @fileoverview Find any times in a string
-// @param text {str} A document, potentially containing many times
+// @param text {str} A text, potentially containing many times
 // @returns {any[]} A list of tuples for each time containing
 //   (q-time; timeText; startIndex; 1+endIndex)
 findTimes:{[text]
@@ -18,7 +18,7 @@ findTimes:{[text]
 // @kind function
 // @category nlp
 // @fileoverview Find all the dates in a document
-// @param text {str} A document, potentially containing many dates
+// @param text {str} A text, potentially containing many dates
 // @returns {any[]} A list of tuples for each time containing 
 //   (startDate; endDate; dateText; startIndex; 1+endIndex)
 findDates:{[text]
@@ -205,7 +205,7 @@ jaroWinkler:{[str1;str2]
 
 // @kind function
 // @category nlp
-// @fileoverview Generate a feature vector (of stemmed tokens) for a term
+// @fileoverview Find related terms and their significance to a word
 // @param parsedTab {tab} A parsed document containing keywords and their
 //   associated significance scores
 // @param term {sym} The tokens to find related terms for
@@ -230,8 +230,8 @@ findRelatedTerms:{[parsedTab;term]
 
 // @kind function
 // @category nlp
-// @fileoverview Find runs containing term where each word has above average 
-//   co-ocurrance with a provided term
+// @fileoverview Find tokens that contain the term where each consecutive word
+//   has an above-average co-occurrence with the term
 // @param parsedTab {tab} A parsed document containing keywords and their
 //   associated significance scores
 // @param term {sym} The term to extract phrases around
