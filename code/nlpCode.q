@@ -93,14 +93,16 @@ sentiment:{[text]
 //   "Comparing corpora using frequency profiling."
 //   Proceedings of the workshop on Comparing Corpora. Association for 
 //   Computational Linguistics, 2000
-// @param corpus1 {tab} A corpus of documents
-// @param corpus2 {tab} A corpus of documents  
-// @returns {dict[]} A dictionary of terms and their affinities for corpus2 
-//   over corpus1
-compareCorpora:{[corpus1;corpus2]
-  if[not min count each (corpus1;corpus2);:((`$())!();(`$())!())];
-  termCountA:i.getTermCount corpus1;
-  termCountB:i.getTermCount corpus2;
+// @param parsedTab1 {tab} A parsed document containing keywords and their
+//   associated significance scores
+// @param parsedTab2 {tab} A parsed document containing keywords and their
+//   associated significance scores
+// @returns {dict[]} A dictionary of terms and their affinities for parsedTab2 
+//   over parsedTab1
+compareCorpora:{[parsedTab1;parsedTab2]
+  if[not min count each (parsedTab1;parsedTab2);:((`$())!();(`$())!())];
+  termCountA:i.getTermCount parsedTab1;
+  termCountB:i.getTermCount parsedTab2;
   totalWordCountA:sum termCountA;
   totalWordCountB:sum termCountB;
   // The expected termCount of each term in each corpus
@@ -116,8 +118,8 @@ compareCorpora:{[corpus1;corpus2]
 // @kind function
 // @category nlp
 // @fileoverview Calculates the cosine similarity of two documents
-// @param keyword1 {dict} A document's keywords
-// @param keyword2 {dict} A document's keywords
+// @param keywords1 {dict} Keywords and their significance scores 
+// @param keywords2 {dict} Keywords and their significance scores 
 // @returns {float} The cosine similarity of two documents
 compareDocs:{[keyword1;keyword2]
   keywords:distinct raze key each(keyword1;keyword2);
@@ -149,7 +151,7 @@ explainSimilarity:{[keywords1;keywords2]
   alignedKeys:inter[key keywords1;key keywords2];
   keywords1@:alignedKeys;
   keywords2@:alignedKeys;
-  product:(keywords2%i.magnitude keywords1)*(doc2%i.magnitude doc2);
+  product:(keywords2%i.magnitude keywords1)*(keywords2%i.magnitude keywords2);
   desc alignedKeys!product%sum product
   }
 
@@ -161,20 +163,20 @@ explainSimilarity:{[keywords1;keywords2]
 //   the centroid don't get subtracted.
 //   This assumes that the centroid is the sum, not the avg, of the documents
 //   in the cluster
-// @param centroid {dict} The sum of all documents in a cluster
-// @param doc {dict} A document in the cluster
+// @param centroid {dict} The sum of all the keywords significance scores
+// @param keywords {dict} Keywords and their significance scores 
 // @returns {float} The cosine similarity of a document and centroid
-compareDocToCentroid:{[centroid;doc]
-  doc@:alignedKeys:distinct key[centroid],key doc;
-  vec:centroid[alignedKeys]-doc;
-  cosineSimilarity[doc;vec]
+compareDocToCentroid:{[centroid;keywords]
+  keywords@:alignedKeys:distinct key[centroid],key keywords;
+  vec:centroid[alignedKeys]-keywords;
+  cosineSimilarity[keywords;vec]
   }
 
 // @kind function
 // @category nlp
 // @fileoverview Find the cosine similarity between one document and all the
 //   other documents of the corpus
-// @param keywords {dict[]} A list of dictionaries of keywords and coefficients
+// @param keywords {dict} Keywords and their significance scores 
 // @param idx {num} The index of the feature vector to compare to the rest of
 //   the corpus
 // @returns {float[]} The document's significance to the rest of the corpus
@@ -184,7 +186,8 @@ compareDocToCorpus:{[keywords;idx]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculate the Jaro-Winkler distance of two strings
+// @fileoverview Calculate the Jaro-Winkler distance of two strings,
+//   scored between 0 and 1
 // @param str1 {str;str[]} A string of text
 // @param str2 {str;str[]} A string of text
 // @returns {float} The Jaro-Winkler of two strings, between 0 and 1
@@ -203,23 +206,24 @@ jaroWinkler:{[str1;str2]
 // @kind function
 // @category nlp
 // @fileoverview Generate a feature vector (of stemmed tokens) for a term
-// @param corpus {tab} A corpus of documents
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @param term {sym} The tokens to find related terms for
 // @returns {dict} The related tokens and their relevances
-findRelatedTerms:{[corpus;term]
+findRelatedTerms:{[parsedTab;term]
   term:lower term;
-  stopWords:where each corpus`isStop;
-  sent:raze corpus[`sentIndices]cut'@'[corpus[`tokens];stopWords;:;`];
+  stopWords:where each parsedTab`isStop;
+  sent:raze parsedTab[`sentIndices]cut'@'[parsedTab[`tokens];stopWords;:;`];
   sent@:asc distinct raze 0|-1 0 1+\:where term in/:sent;
   // The number of sentences the term co-occurs in
   coOccur:` _ count each group raze distinct each sent;
-  idx:where each corpus[`tokens]in\:key coOccur;
+  idx:where each parsedTab[`tokens]in\:key coOccur;
   // Find how many sentences each word occurs in
-  totOccur:idx@'group each corpus[`tokens]@'idx;
-  sentInd:corpus[`sentIndices]bin'totOccur;
+  totOccur:idx@'group each parsedTab[`tokens]@'idx;
+  sentInd:parsedTab[`sentIndices]bin'totOccur;
   totOccur:i.fastSum((count distinct@)each)each sentInd;
   coOccur%:totOccur term;
-  totOccur%:sum count each corpus`sentIndices;
+  totOccur%:sum count each parsedTab`sentIndices;
   results:(coOccur-totOccur)%sqrt totOccur*1-totOccur;
   desc except[where results>0;term]#results
   }
@@ -228,13 +232,14 @@ findRelatedTerms:{[corpus;term]
 // @category nlp
 // @fileoverview Find runs containing term where each word has above average 
 //   co-ocurrance with a provided term
-// @param corpus {tab} A corpus of documents
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @param term {sym} The term to extract phrases around
 // @returns {dict} Phrases as the keys, and their relevance as the values
-extractPhrases:{[corpus;term]
+extractPhrases:{[parsedTab;term]
   term:lower term;
-  tokens:corpus`tokens;
-  related:findRelatedTerms[corpus]term;
+  tokens:parsedTab`tokens;
+  related:findRelatedTerms[parsedTab]term;
   // This gets the top words that have an above average relavance to the 
   // query term
   relevant:term,sublist[150]where 0<related;
@@ -253,11 +258,12 @@ extractPhrases:{[corpus;term]
 //   "Level statistics of words: Finding keywords in literary texts
 //    and symbolic sequences."
 //   Physical Review E 79.3 (2009): 035102.
-// @param docs {tab} A collection of documents 
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @returns {dict} Where the keys are keywords as symbols, and the values are 
 //   their significance, as floats,with higher values being more significant
-keywordsContinuous:{[docs]
-  text:raze docs[`tokens]@'where each not docs`isStop;
+keywordsContinuous:{[parsedTab]
+  text:raze parsedTab[`tokens]@'where each not parsedTab`isStop;
   groupTxt:group text;
   n:count each groupTxt;
   // Find the distinct words, ignoring stop words and those with 3 or fewer 
@@ -276,12 +282,13 @@ keywordsContinuous:{[docs]
 // @kind function
 // @category nlp
 // @fileoverview Find the TF-IDF scores for all terms in all documents
-// @param corpus {tab} A table of documents
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @returns {dict[]} For each document, a dictionary with the tokens as keys,
 //   and relevance as values
-TFIDF:{[corpus]
-  nums:corpus[`tokens]like\:"[0-9]*";
-  tokens:corpus[`tokens]@'where each not corpus[`isStop]|nums;
+TFIDF:{[parsedTab]
+  nums:parsedTab[`tokens]like\:"[0-9]*";
+  tokens:parsedTab[`tokens]@'where each not parsedTab[`isStop]|nums;
   words:distinct each tokens;
   // The term frequency of each token within the document
   TF:{x!{sum[x in y]%count x}[y]each x}'[words;tokens];
@@ -297,16 +304,17 @@ TFIDF:{[corpus]
 // @fileoverview Find runs of tokens whose POS tags are in the set passed in
 // @param tagType {sym} `uniPOS or `pennPOS (Universal or Penn Part-of-Speech)
 // @param tags {sym;sym[]} One or more POS tags
-// @param doc {dict} A single document
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @returns {(str;long)} Two item list containing
 //   1. The text of the run as a symbol vector
 //   2. The index associated with the first token
-findPOSRuns:{[tagType;tags;doc]
-  matchingTag:doc[tagType]in tags;
+findPOSRuns:{[tagType;tags;parsedTab]
+  matchingTag:parsedTab[tagType]in tags;
   start:where 1=deltas matchingTag;
   lengths:sum each start cut matchingTag;
   idx:start+til each lengths; 
-  runs:`$" "sv/:string each doc[`tokens]start+til each lengths;
+  runs:`$" "sv/:string each parsedTab[`tokens]start+til each lengths;
   flip(runs;idx)
   }
 
@@ -314,14 +322,34 @@ findPOSRuns:{[tagType;tags;doc]
 // @category nlp
 // @fileoverview Determine the probability of one word following another
 //   in a sequence of words
-// @param corpus {tab} A corpus of documents
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @returns {dict} The probability that the secondary word in the sequence 
 //   follows the primary word.
-biGram:{[corpus]
-  nums:corpus[`tokens]like\:"[0-9]*";
-  tokens:raze corpus[`tokens]@'where each not corpus[`isStop]|nums;
+biGram:{[parsedTab]
+  nums:parsedTab[`tokens]like\:"[0-9]*";
+  tokens:raze parsedTab[`tokens]@'where each not parsedTab[`isStop]|nums;
   occurance:(distinct tokens)!{count where y=x}[tokens]each distinct tokens;
   raze i.biGram[tokens;occurance]''[tokens;next tokens]
+  }
+
+// @kind function
+// @category nlp
+// @fileoverview Determine the probability of a `n` tokens appearing together
+//   in a text
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
+// @param n {long} The number of words to occur together
+// @returns {dict} The probability of `n` tokens appearing together in a text
+nGram:{[parsedTab;n]
+  nums:parsedTab[`tokens]like\:"[0-9]*";
+  tokens:raze parsedTab[`tokens]@'where each not parsedTab[`isStop]|nums;
+  tab:rotate\:[til n]tokens;
+  nGroup:last[tab]group neg[n-1]_flip(n-1)#tab;
+  occurance:{(count each group x)%count x}each nGroup;
+  returnKeys:raze key[occurance],/:'{key x}each value occurance;
+  returnVals:raze value each value occurance;
+  returnKeys!returnVals
   }
 
 // Util 
@@ -385,36 +413,17 @@ detectLang:{[text]
 // @param filepath {str} The directories file path
 // @returns {tab} Filenames, paths and texts contained within the filepath
 loadTextFromDir:{[filepath]
-  filepath:hsym`$filepath;
-  keyFilepath:key filepath;
-  path:{raze$[11=abs type keyPath:key x;x;.z.s each` sv'x,'keyPath]}filepath;
+  path:{raze$[-11=type k:key fp:hsym x;fp;.z.s each` sv'fp,'k]}`$filepath;
   ([]fileName:(` vs'path)[;1];path;text:"\n"sv'read0 each path)
   }
 
 // @kind function
 // @category nlp
 // @fileOverview Get all the sentences for a document
-// @param doc {dict} A document record
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @returns {str[]} All the sentences from a document
-getSentences:{[doc]
-  (sublist[;doc`text]deltas@)each doc`sentChars
+getSentences:{[parsedTab]
+  (sublist[;parsedTab`text]deltas@)each parsedTab`sentChars
   }
 
-// @kind function
-// @category nlp
-// @fileoverview Determine the probability of a `n` tokens appearing together
-//   in a text
-// @param corpus {tab} A corpus of documents
-// @param n {long} The number of words to occur together
-// @returns {dict} The probability that the next `n` tokens in the sequence 
-//   follows the primary word.
-nGram:{[corpus;n]
-  nums:corpus[`tokens]like\:"[0-9]*";
-  tokens:raze corpus[`tokens]@'where each not corpus[`isStop]|nums;
-  tab:rotate\:[til n]tokens;
-  nGroup:last[tab]group neg[n-1]_flip(n-1)#tab;
-  occurance:{(count each group x)%count x}each nGroup;
-  returnKeys:raze key[occurance],/:'{key x}each value occurance;
-  returnVals:raze value each value occurance;
-  returnKeys!returnVals
-  }

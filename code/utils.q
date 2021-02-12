@@ -170,15 +170,16 @@ i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
 // @kind function
 // @category nlpUtility
 // @fileoverview Get the count of individual terms in a corpus
-// @params corpus {tab} A corpus of documents
+// @param parsedTab {tab} A parsed document containing keywords and their
+//   associated significance scores
 // @returns {dict} The count of terms in the corpus
-i.getTermCount:{[corpus]
-  tokens:corpus[`tokens]@'where each not corpus`isStop;
+i.getTermCount:{[parsedTab]
+  tokens:parsedTab[`tokens]@'where each not parsedTab`isStop;
   i.fastSum{1+log count each group x}each tokens
   }
 
 // @kind function
-// @category nlp
+// @category nlpUtility
 // @fileoverview Calculate the probability of words appearing in a text
 // @param tokens {sym[]} The tokens in the text
 // @param occurance {dict} The total times a token appears in the text
