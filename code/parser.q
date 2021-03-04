@@ -1,21 +1,26 @@
+// code/parser.q - Nlp parser utilities
+// Copyright (c) 2021 Kx Systems Inc
+//
+// Utilities for parsing 
+
 \d .nlp
 
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview Retrieve python function for running spacy
+// @desc Retrieve python function for running spacy
 parser.i.parseText:.p.get[`get_doc_info;<];
 
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview Convert string input to an appropriate
+// @desc Convert string input to an appropriate
 //   byte representation suitable for application in Python
 //   functions, this is particularly useful when dealing with
 //   languages other than English
-// @param data {str} Any input string containing any character
+// @param data {string} Any input string containing any character
 //   arrays
-// @returns {str} The data parsed such that UTF-8 compliant
+// @returns {string} The data parsed such that UTF-8 compliant
 //   characters can be appropriately managed by the NLP models
 parser.i.cleanUTF8:{[data]
   byteDecode:.p.import[`builtins;`:bytes.decode;<];
@@ -26,7 +31,7 @@ parser.i.cleanUTF8:{[data]
 // @private
 // @kind data
 // @category nlpParserUtility
-// @fileoverview Dependent options for input to spacy module
+// @desc Dependent options for input to spacy module
 parser.i.depOpts:(!). flip(
   (`keywords;   `tokens`isStop);
   (`sentChars;  `sentIndices);
@@ -39,7 +44,7 @@ parser.i.depOpts:(!). flip(
 // @private
 // @kind data
 // @category nlpParserUtility
-// @fileoverview Map from q-style attribute names to spacy
+// @desc Map from q-style attribute names to spacy
 parser.i.q2spacy:(!). flip(
   (`likeEmail;  `like_email);
   (`likeNumber; `like_num);
@@ -54,7 +59,7 @@ parser.i.q2spacy:(!). flip(
 // @private
 // @kind data
 // @category nlpParserUtility
-// @fileoverview Model inputs for spacy 'alpha' models
+// @desc Model inputs for spacy 'alpha' models
 parser.i.alphaLang:(!). flip(
   (`ja;`Japanese);
   (`zh;`Chinese))
@@ -62,12 +67,12 @@ parser.i.alphaLang:(!). flip(
 // @private
 // @kind function
 // @category nlpParser
-// @fileOverview Create a new parser
-// @param modelName {sym} The spaCy model/language to use. 
+// @desc Create a new parser
+// @param modelName {symbol} The spaCy model/language to use. 
 //   This must already be installed.
-// @param options {sym[]} The fields the parser should return
-// @param disabled {sym[]} The modules to be disabled
-// @returns {func} a parser for the given language
+// @param options {symbol[]} The fields the parser should return
+// @param disabled {symbol[]} The modules to be disabled
+// @returns {fn} a parser for the given language
 parser.i.newSubParser:{[modelName;options;disabled] 
   checkLang:parser.i.alphaLang modelName;
   lang:$[`~checkLang;`spacy;sv[`]`spacy.lang,modelName];
@@ -93,14 +98,14 @@ parser.i.newSubParser:{[modelName;options;disabled]
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview Parser operations that must be done in q, or give better 
+// @desc Parser operations that must be done in q, or give better 
 //   performance in q
-// @param pyParser {func} A projection to call the spacy parser
-// @param fieldNames {sym[]} The field names the parser should return
-// @param options {sym[]} The fields to compute
-// @param stopWords {sym[]} The stopWords in the text
-// @param docs {str;str[]} The text being parsed
-// @returns {dict;tab} The parsed document(s)
+// @param pyParser {fn} A projection to call the spacy parser
+// @param fieldNames {symbol[]} The field names the parser should return
+// @param options {symbol[]} The fields to compute
+// @param stopWords {symbol[]} The stopWords in the text
+// @param docs {string;string[]} The text being parsed
+// @returns {dictionary;table} The parsed document(s)
 parser.i.runParser:{[pyParser;fieldNames;options;stopWords;docs]
   tab:parser.i.cleanUTF8 each docs;
   parsed:parser.i.unpack[pyParser;options;stopWords]each tab;
@@ -112,13 +117,13 @@ parser.i.runParser:{[pyParser;fieldNames;options;stopWords;docs]
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileOverview This handles operations such as casting/removing punctuation
+// @desc This handles operations such as casting/removing punctuation
 //   that need to be done in q, or for performance reasons are better in q
-// @param pyParser {func} A projection to call the spaCy parser
-// @param options {sym[]} The fields to include in the output
-// @param stopWords {sym[]} The stopWords in the text
-// @param text {str} The text being parsed
-// @returns {dict} The parsed document
+// @param pyParser {fn} A projection to call the spaCy parser
+// @param options {symbol[]} The fields to include in the output
+// @param stopWords {symbol[]} The stopWords in the text
+// @param text {string} The text being parsed
+// @returns {dictionary} The parsed document
 parser.i.unpack:{[pyParser;options;stopWords;text]
   names:inter[key[parser.i.q2spacy],`sentChars`sentIndices;options],`isPunct;
   doc:names!pyParser text;
@@ -142,12 +147,12 @@ parser.i.unpack:{[pyParser;options;stopWords;text]
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview This converts python indices to q indices in the text
+// @desc This converts python indices to q indices in the text
 //   This has to be done because python indexes into strings by char instead
 //   of byte, so must be modified to index a q string
-// @param text {str} The text being parsed
-// @param doc {dict} The parsed document
-// @returns {dict} The document with corrected indices
+// @param text {string} The text being parsed
+// @param doc {dictionary} The parsed document
+// @returns {dictionary} The document with corrected indices
 parser.i.adjustIndices:{[text;doc]
   if[1~count text;text:enlist text];
   // Any bytes following the first byte in UTF-8 multi-byte characters
@@ -169,9 +174,9 @@ parser.i.adjustIndices:{[text;doc]
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview Removes punctuation and space tokens and updates indices
-// @param doc {dict} The parsed document
-// @returns {dict} The parsed document with punctuation removed
+// @desc Removes punctuation and space tokens and updates indices
+// @param doc {dictionary} The parsed document
+// @returns {dictionary} The parsed document with punctuation removed
 parser.i.removePunct:{[doc]
   // Extract document attributes
   attrs:cols doc;
@@ -184,9 +189,9 @@ parser.i.removePunct:{[doc]
 // @private
 // @kind function
 // @category nlpParserUtility
-// @fileoverview Parse a URL into its constituent components
-// @param url {str} The URL to be decomposed into its components
-// @returns {str[]} The components which make up the 
+// @desc Parse a URL into its constituent components
+// @param url {string} The URL to be decomposed into its components
+// @returns {string[]} The components which make up the 
 parser.i.parseURLs:{[url]
   pyLambda:"lambda url: urlparse(url if seReg.match(url) ",
     "else 'http://' + url)";

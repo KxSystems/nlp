@@ -1,9 +1,14 @@
+// code/email.q - Nlp sentiment utilities
+// Copyright (c) 2021 Kx Systems Inc
+//
+// Utilities for sentiment analysis 
+
 \d .nlp
 
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Create a regex patterns used for tokenization
+// @desc Create a regex patterns used for tokenization
 // @returns {<} The compiled regex object
 sent.i.tokenPattern:{
   rightFacingEmoticons:"[<>]?[:;=8][\\-o\\*\\']?[\\)\\]\\(\\[dDpP/\\:\\}\\{@",
@@ -23,10 +28,10 @@ sent.i.tokenPattern:{
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Tokenizer specifically for sentiment analyzer 
+// @desc Tokenizer specifically for sentiment analyzer 
 //   (won't work for general purpose tokenizing)
-// @param text {str} The text to be tokenized
-// @returns {sym[]} The tokens of the text 
+// @param text {string} The text to be tokenized
+// @returns {symbol[]} The tokens of the text 
 //   (each word/emoticon ends up in its own token)
 sent.i.tokenize:{[text]
   `$regex.matchAll[sent.i.tokenPattern;text][;0]
@@ -35,10 +40,10 @@ sent.i.tokenize:{[text]
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Check for added emphasis resulting from exclamation points 
+// @desc Check for added emphasis resulting from exclamation points 
 //   (up to 4 of them) using empirically derived mean sentiment intensity. 
 //   Ratings increase for exclamation points
-// @param text {str} The complete sentence
+// @param text {string} The complete sentence
 // @returns {float} An amount to increase the sentiment by
 sent.i.amplifyEP:{[text]
   .292*4&sum"!"=text
@@ -47,10 +52,10 @@ sent.i.amplifyEP:{[text]
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Check for added emphasis resulting from question marks 
+// @desc Check for added emphasis resulting from question marks 
 //   (2 or 3+) using empirically derived mean sentiment intensity rating. 
 //   Ratings increases for question marks
-// @param text {str} The complete sentence
+// @param text {string} The complete sentence
 // @returns {float} An amount to increase the sentiment by
 sent.i.amplifyQM:{[text]
   (0 0 .36 .54 .96)4&sum"?"=text
@@ -59,7 +64,7 @@ sent.i.amplifyQM:{[text]
 // @private 
 // @kind data
 // @category nlpSentUtility
-// @fileoverview Positive booster words. This increases positive valences
+// @desc Positive booster words. This increases positive valences
 sent.i.posBoosters:`$(
   "absolutely";"amazingly";"awfully";"completely";"considerably";"decidedly";
   "deeply";"effing";"enormously";"entirely";"especially";"exceptionally";
@@ -72,7 +77,7 @@ sent.i.posBoosters:`$(
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview Negative booster words. This increase negative valences 
+// @desc Negative booster words. This increase negative valences 
 sent.i.negBoosters:`$(
   "almost";"barely";"hardly";"just enough";"kind of";"kinda";"kindof";
   "kind-of";"less";"little";"marginally";"occasionally";"partly";"scarcely";
@@ -81,19 +86,19 @@ sent.i.negBoosters:`$(
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview The co-efficient how much boosters increase sentiment
+// @desc The co-efficient how much boosters increase sentiment
 sent.i.BOOSTER_INCR:.293
 
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview The co-efficient how much allcaps increase sentiment
+// @desc The co-efficient how much allcaps increase sentiment
 sent.i.ALLCAPS_INCR:.733
 
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview A dictionary mapping all possible boosters
+// @desc A dictionary mapping all possible boosters
 //   to their associated values
 sent.i.Boosters:(!). flip(sent.i.posBoosters,\:sent.i.BOOSTER_INCR),
   (sent.i.negBoosters,\:neg sent.i.BOOSTER_INCR)
@@ -101,9 +106,9 @@ sent.i.Boosters:(!). flip(sent.i.posBoosters,\:sent.i.BOOSTER_INCR),
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Add weight for "booster" words like "really", or "very"
-// @param tokens {sym[]} The tokenized sentence
-// @param isUpperCase {bool[]} A vector where an element is 1b if the 
+// @desc Add weight for "booster" words like "really", or "very"
+// @param tokens {symbol[]} The tokenized sentence
+// @param isUpperCase {boolean[]} A vector where an element is 1b if the 
 //   associated token is upper case
 // @param valences {float[]} The sentiment of each token
 // @returns {float} The modified valences
@@ -123,11 +128,11 @@ sent.i.applyBoosters:{[tokens;isUpperCase;valences]
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Decrease the weight of valences before "but", and increase 
+// @desc Decrease the weight of valences before "but", and increase 
 //   the weight of valences after it
-// @param tokens {sym[]} The tokenized sentence
-// @param valences {num[]} The sentiment of each token
-// @returns {num[]} The modified valences
+// @param tokens {symbol[]} The tokenized sentence
+// @param valences {number[]} The sentiment of each token
+// @returns {number[]} The modified valences
 sent.i.butCheck:{[tokens;valences]
   valences:"f"$valences;
   i:tokens?`but;
@@ -138,7 +143,7 @@ sent.i.butCheck:{[tokens;valences]
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview These are terms that negate what follows them
+// @desc These are terms that negate what follows them
 sent.i.NEGATE:`$(
   "aint";"arent";"cannot";"cant";"couldnt";"darent";"didnt";"doesnt";
   "ain't";"aren't";"can't";"couldn't";"daren't";"didn't";"doesn't";
@@ -152,15 +157,15 @@ sent.i.NEGATE:`$(
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview The co-efficient for sentiments following a negation
+// @desc The co-efficient for sentiments following a negation
 sent.i.N_SCALAR:-0.74 
 
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Check if the preceding words increase, decrease, 
+// @desc Check if the preceding words increase, decrease, 
 //   or negate the valence
-// @param tokens {sym[]} The tokenized sentence
+// @param tokens {symbol[]} The tokenized sentence
 // @param valences {float[]} The sentiment of each token
 // @returns {float} The modified valences
 sent.i.negationCheck:{[tokens;valences]
@@ -181,7 +186,7 @@ sent.i.negationCheck:{[tokens;valences]
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview Load the dictionary of terms and their sentiment
+// @desc Load the dictionary of terms and their sentiment
 //   Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model
 //   for Sentiment Analysis of Social Media Text. Eighth International
 //   Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI,June 2014
@@ -190,7 +195,7 @@ sent.i.lexicon :(!).("SF";"\t")0: hsym `$.nlp.path,"/vader/lexicon.txt";
 // @private
 // @kind data
 // @category nlpSentUtility
-// @fileoverview Additional lexicon sentiments
+// @desc Additional lexicon sentiments
 sent.i.lexicon,:(!). flip(
   (`$"the shit"; 3f);
   (`$"the bomb"; 3f);
@@ -203,10 +208,10 @@ sent.i.lexicon,:(!). flip(
 // @private
 // @kind function
 // @category nlpSentUtility
-// @fileoverview Calculate the sentiment, given the individual valences
+// @desc Calculate the sentiment, given the individual valences
 // @param valences {float[]} The sentiment of each token
-// @param text {str} A piece of text
-// @returns {dict} The sentiment of the text along the dimensions
+// @param text {string} A piece of text
+// @returns {dictionary} The sentiment of the text along the dimensions
 //   `pos`neg`neu and`compound
 sent.i.scoreValence:{[valences;text]
   if[not count valences;:`compound`pos`neg`neu!0 0 0 0f];

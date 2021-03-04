@@ -1,10 +1,15 @@
+// code/utils.q - NLP utilities
+// Copyright (c) 2021 Kx Systems Inc
+//
+// General nlp utility functions
+
 \d .nlp
 \l p.q
 
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Import python functions
+// @desc Import python functions
 i.np:.p.import`numpy
 i.str:.p.import[`builtins]`:str
 i.bool:.p.import[`builtins]`:bool
@@ -12,12 +17,12 @@ i.bool:.p.import[`builtins]`:bool
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview A fast way to sum a list of dictionaries in 
+// @desc A fast way to sum a list of dictionaries in 
 //   certain cases
 // @param iter {long} The number of iterations. Note that within this
 //   library iter is set explicitly to 2 for all present invocations
-// @param dict {dict[]} A list of dictionaries
-// @returns {dict} The dictionary values summed together
+// @param dict {dictionary[]} A list of dictionaries
+// @returns {dictionary} The dictionary values summed together
 i.fastSum:{[iter;dict]
   // Summing a large number of dictionaries is expensive if there are many 
   // distinct keys.
@@ -30,9 +35,9 @@ i.fastSum:{[iter;dict]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Replace empty dicts with (,`)!,0f 
-// @param docs {dict[]} Documents of text
-// @returns {dict[]} Any empty dictionaries are filled
+// @desc Replace empty dicts with (,`)!,0f 
+// @param docs {dictionary[]} Documents of text
+// @returns {dictionary[]} Any empty dictionaries are filled
 i.fillEmptyDocs:{[docs]
   $[98=type docs;
     0^docs;
@@ -43,9 +48,9 @@ i.fillEmptyDocs:{[docs]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Given a monotonically increasing list of integral numbers,
+// @desc Given a monotonically increasing list of integral numbers,
 //   this finds any runs of consecutive numbers
-// @param array {num[]} Array of values 
+// @param array {number[]} Array of values 
 // @returns {long[][]} A list of runs of consecutive indices
 i.findRuns:{[array]
   prevVals:array=1+prev array;
@@ -56,10 +61,10 @@ i.findRuns:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Index of the first occurrence of the minimum
+// @desc Index of the first occurrence of the minimum
 //   value of an array
-// @param array {num[]} Array of values 
-// @return {num} The index of the minimum element of the array
+// @param array {number[]} Array of values 
+// @return {number} The index of the minimum element of the array
 i.minIndex:{[array]
   array?min array
   }
@@ -67,10 +72,10 @@ i.minIndex:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Index of the first occurrence of the maximum
+// @desc Index of the first occurrence of the maximum
 //   value of the array
-// @param array {num[]} Array of values 
-// @return {num} The index of the maximum element of the array
+// @param array {number[]} Array of values 
+// @return {number} The index of the maximum element of the array
 i.maxIndex:{[array]
   array?max array
   }
@@ -78,8 +83,8 @@ i.maxIndex:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Calculate the harmonic mean
-// @param array {num[]} Array of values 
+// @desc Calculate the harmonic mean
+// @param array {number[]} Array of values 
 // @returns {float} The harmonic mean of the input
 i.harmonicMean:{[array]
   1%avg 1%array
@@ -88,8 +93,8 @@ i.harmonicMean:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Calculate a vector's magnitude
-// @param array {num[]} Array of values 
+// @desc Calculate a vector's magnitude
+// @param array {number[]} Array of values 
 // @returns {float} The magnitude of the vector
 i.magnitude:{[array]
   sqrt sum array*array
@@ -98,9 +103,9 @@ i.magnitude:{[array]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Normalize a list or dictionary so the highest value is 1f
-// @param vals {float[];dict} A list or dictionary of numbers
-// @returns {float[];dict} The input, normalized
+// @desc Normalize a list or dictionary so the highest value is 1f
+// @param vals {float[]|dictionary} A list or dictionary of numbers
+// @returns {float[]|dictionary} The input, normalized
 i.normalize:{[vals]
   vals%max vals
   }
@@ -108,7 +113,7 @@ i.normalize:{[vals]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Takes the largest N values
+// @desc Takes the largest N values
 // @param n {long} The number of elements to take
 // @param vals {any[]} A list of values
 // @returns {any[]} The largest N values
@@ -119,9 +124,9 @@ i.takeTop:{[n;vals]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Calculate the Jaro similarity score of two strings
-// @param str1 {str;str[]} A string of text
-// @param str2 {str;str[]} A string of text
+// @desc Calculate the Jaro similarity score of two strings
+// @param str1 {string|string[]} A string of text
+// @param str2 {string|string[]} A string of text
 // @returns {Float} The similarity score of two strings
 i.jaro:{[str1;str2]
   lenStr1:count str1;
@@ -143,7 +148,7 @@ i.jaro:{[str1;str2]
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Generating symmetric matrix from triangle (ragged list)
+// @desc Generating symmetric matrix from triangle (ragged list)
 //   This is used to save time when generating a matrix where the upper 
 //   triangular component is the mirror of the lower triangular component
 // @param raggedList {float[][]} A list of lists of floats representing
@@ -161,7 +166,7 @@ i.matrixFromRaggedList:{[raggedList]
 // @private
 // @kind data
 // @category nlpUtility
-// @fileoverview Parts-of-speech not useful as keywords
+// @desc Parts-of-speech not useful as keywords
 i.stopUniPOS:asc`ADP`PART`AUX`CONJ`DET`SYM`NUM`PRON`SCONJ
 i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
   `$("PRP$";"WP$";"$")
@@ -169,10 +174,10 @@ i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
 // @private
 // @kind function
 // @category nlpUtility
-// @fileoverview Get the count of individual terms in a corpus
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Get the count of individual terms in a corpus
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {dict} The count of terms in the corpus
+// @returns {dictionary} The count of terms in the corpus
 i.getTermCount:{[parsedTab]
   tokens:parsedTab[`tokens]@'where each not parsedTab`isStop;
   i.fastSum{1+log count each group x}each tokens
@@ -180,13 +185,13 @@ i.getTermCount:{[parsedTab]
 
 // @kind function
 // @category nlpUtility
-// @fileoverview Calculate the probability of words appearing in a text
-// @param tokens {sym[]} The tokens in the text
-// @param occurance {dict} The total times a token appears in the text
-// @param token {sym} A single token
-// @param nextToken {sym} The next token in the list of tokens
-// @returns {dict} The probability that the secondary word in the sequence 
-//   follows the primary word.
+// @desc Calculate the probability of words appearing in a text
+// @param tokens {symbol[]} The tokens in the text
+// @param occurance {dictionary} The total times a token appears in the text
+// @param token {symbol} A single token
+// @param nextToken {symbol} The next token in the list of tokens
+// @returns {dictionary} The probability that the secondary word in the 
+//   sequence follows the primary word.
 i.biGram:{[tokens;occurance;token;nextToken]
   returnKeys:enlist(token;nextToken);
   countToken:count where nextToken=tokens 1+where token=tokens;

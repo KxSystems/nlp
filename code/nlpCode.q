@@ -1,11 +1,16 @@
+// code/nlpCode.q - NLP code
+// Copyright (c) 2021 Kx Systems Inc
+//
+// Main NLP code base
+
 \d .nlp
 
 // Date-Time
 
 // @kind function
 // @category nlp
-// @fileoverview Find any times in a string
-// @param text {str} A text, potentially containing many times
+// @desc Find any times in a string
+// @param text {string} A text, potentially containing many times
 // @returns {any[]} A list of tuples for each time containing
 //   (q-time; timeText; startIndex; 1+endIndex)
 findTimes:{[text]
@@ -17,8 +22,8 @@ findTimes:{[text]
 
 // @kind function
 // @category nlp
-// @fileoverview Find all the dates in a document
-// @param text {str} A text, potentially containing many dates
+// @desc Find all the dates in a document
+// @param text {string} A text, potentially containing many dates
 // @returns {any[]} A list of tuples for each time containing 
 //   (startDate; endDate; dateText; startIndex; 1+endIndex)
 findDates:{[text]
@@ -36,10 +41,10 @@ findDates:{[text]
 
 // @kind function
 // @category nlp
-// @fileOverview Parse URLs into dictionaries containing the
+// @desc Parse URLs into dictionaries containing the
 //   constituent components
-// @param url {str} The URL to decompose into its components
-// @returns {dict} Contains information about the scheme, domain name 
+// @param url {string} The URL to decompose into its components
+// @returns {dictionary} Contains information about the scheme, domain name 
 //   and other URL information
 parseURLs:{[url]
   urlKeys:`scheme`domainName`path`parameters`query`fragment;
@@ -49,11 +54,11 @@ parseURLs:{[url]
 
 // @kind function
 // @category nlp
-// @fileOverview Create a new parser
-// @param spacyModel {sym} The spaCy model/language to use. 
+// @desc Create a new parser
+// @param spacyModel {symbol} The spaCy model/language to use. 
 //   This must already be installed.
-// @param fieldNames {sym[]} The fields the parser should return
-// @returns {func} A function to parse text
+// @param fieldNames {symbol[]} The fields the parser should return
+// @returns {fn} A function to parse text
 newParser:{[spacyModel;fieldNames]
   options:{distinct x,raze parser.i.depOpts x}/[fieldNames];
   disabled:`ner`tagger`parser except options;
@@ -68,11 +73,11 @@ newParser:{[spacyModel;fieldNames]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculate the sentiment of a sentence or short message, 
+// @desc Calculate the sentiment of a sentence or short message, 
 //   such as a tweet
-// @param text {str} The text to score
-// @returns {dict} The score split up into compound, positive, negative and 
-//   neutral components
+// @param text {string} The text to score
+// @returns {dictionary} The score split up into compound, positive, negative 
+//   and neutral components
 sentiment:{[text]
   valences:sent.i.lexicon tokens:lower rawTokens:sent.i.tokenize text;
   isUpperCase:(rawTokens=upper rawTokens)& rawTokens<>tokens;
@@ -88,17 +93,17 @@ sentiment:{[text]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculates the affinity between terms in two corpus' using
+// @desc Calculates the affinity between terms in two corpus' using
 //   an Algorithm from Rayson, Paul and Roger Garside.
 //   "Comparing corpora using frequency profiling."
 //   Proceedings of the workshop on Comparing Corpora. Association for 
 //   Computational Linguistics, 2000
-// @param parsedTab1 {tab} A parsed document containing keywords and their
+// @param parsedTab1 {table} A parsed document containing keywords and their
 //   associated significance scores
-// @param parsedTab2 {tab} A parsed document containing keywords and their
+// @param parsedTab2 {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {dict[]} A dictionary of terms and their affinities for parsedTab2 
-//   over parsedTab1
+// @returns {dictionary[]} A dictionary of terms and their affinities for 
+//   parsedTab2 over parsedTab1
 compareCorpora:{[parsedTab1;parsedTab2]
   if[not min count each (parsedTab1;parsedTab2);:((`$())!();(`$())!())];
   termCountA:i.getTermCount parsedTab1;
@@ -117,9 +122,9 @@ compareCorpora:{[parsedTab1;parsedTab2]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculates the cosine similarity of two documents
-// @param keywords1 {dict} Keywords and their significance scores 
-// @param keywords2 {dict} Keywords and their significance scores 
+// @desc Calculates the cosine similarity of two documents
+// @param keywords1 {dictionary} Keywords and their significance scores 
+// @param keywords2 {dictionary} Keywords and their significance scores 
 // @returns {float} The cosine similarity of two documents
 compareDocs:{[keyword1;keyword2]
   keywords:distinct raze key each(keyword1;keyword2);
@@ -128,9 +133,9 @@ compareDocs:{[keyword1;keyword2]
 
 // @kind function
 // @category nlp
-// @fileoverview A function for comparing the similarity of two vectors
-// @param keywords1 {dict} Keywords and their significance scores 
-// @param keywords2 {dict} Keywords and their significance scores 
+// @desc A function for comparing the similarity of two vectors
+// @param keywords1 {dictionary} Keywords and their significance scores 
+// @param keywords2 {dictionary} Keywords and their significance scores 
 // @returns {float} Similarity score between -1f and 1f inclusive, 1 being
 //   perfectly similar, -1 being perfectly dissimilar
 cosineSimilarity:{[keywords1;keywords2]
@@ -141,11 +146,11 @@ cosineSimilarity:{[keywords1;keywords2]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculate how much each term contributes to the 
+// @desc Calculate how much each term contributes to the 
 //   cosine similarity
-// @param keywords1 {dict} Keywords and their significance scores 
-// @param keywords2 {dict} Keywords and their significance scores 
-// @returns {dict} A dictionary of how much of the similarity score each 
+// @param keywords1 {dictionary} Keywords and their significance scores 
+// @param keywords2 {dictionary} Keywords and their significance scores 
+// @returns {dictionary} A dictionary of how much of the similarity score each 
 //   token is responsible for
 explainSimilarity:{[keywords1;keywords2]
   alignedKeys:inter[key keywords1;key keywords2];
@@ -157,14 +162,14 @@ explainSimilarity:{[keywords1;keywords2]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculates the cosine similarity of a document and a centroid,
+// @desc Calculates the cosine similarity of a document and a centroid,
 //   subtracting the document from the centroid.
 //   This does the subtraction after aligning the keys so that terms not in 
 //   the centroid don't get subtracted.
 //   This assumes that the centroid is the sum, not the avg, of the documents
 //   in the cluster
-// @param centroid {dict} The sum of all the keywords significance scores
-// @param keywords {dict} Keywords and their significance scores 
+// @param centroid {dictionary} The sum of all the keywords significance scores
+// @param keywords {dictionary} Keywords and their significance scores 
 // @returns {float} The cosine similarity of a document and centroid
 compareDocToCentroid:{[centroid;keywords]
   keywords@:alignedKeys:distinct key[centroid],key keywords;
@@ -174,11 +179,11 @@ compareDocToCentroid:{[centroid;keywords]
 
 // @kind function
 // @category nlp
-// @fileoverview Find the cosine similarity between one document and all the
+// @desc Find the cosine similarity between one document and all the
 //   other documents of the corpus
-// @param keywords {dict} Keywords and their significance scores 
-// @param idx {num} The index of the feature vector to compare to the rest of
-//   the corpus
+// @param keywords {dictionary} Keywords and their significance scores 
+// @param idx {number} The index of the feature vector to compare to the rest
+//   of the corpus
 // @returns {float[]} The document's significance to the rest of the corpus
 compareDocToCorpus:{[keywords;idx]
   compareDocs[keywords idx]each(idx+1)_ keywords
@@ -186,10 +191,10 @@ compareDocToCorpus:{[keywords;idx]
 
 // @kind function
 // @category nlp
-// @fileoverview Calculate the Jaro-Winkler distance of two strings,
+// @desc Calculate the Jaro-Winkler distance of two strings,
 //   scored between 0 and 1
-// @param str1 {str;str[]} A string of text
-// @param str2 {str;str[]} A string of text
+// @param str1 {str|string[]} A string of text
+// @param str2 {string|string[]} A string of text
 // @returns {float} The Jaro-Winkler of two strings, between 0 and 1
 jaroWinkler:{[str1;str2]
   str1:lower str1;
@@ -205,11 +210,11 @@ jaroWinkler:{[str1;str2]
 
 // @kind function
 // @category nlp
-// @fileoverview Find related terms and their significance to a word
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Find related terms and their significance to a word
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @param term {sym} The tokens to find related terms for
-// @returns {dict} The related tokens and their relevances
+// @param term {symbol} The tokens to find related terms for
+// @returns {dictionary} The related tokens and their relevances
 findRelatedTerms:{[parsedTab;term]
   term:lower term;
   stopWords:where each parsedTab`isStop;
@@ -230,12 +235,12 @@ findRelatedTerms:{[parsedTab;term]
 
 // @kind function
 // @category nlp
-// @fileoverview Find tokens that contain the term where each consecutive word
+// @desc Find tokens that contain the term where each consecutive word
 //   has an above-average co-occurrence with the term
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @param term {sym} The term to extract phrases around
-// @returns {dict} Phrases as the keys, and their relevance as the values
+// @param term {symbol} The term to extract phrases around
+// @returns {dictionary} Phrases as the keys, and their relevance as the values
 extractPhrases:{[parsedTab;term]
   term:lower term;
   tokens:parsedTab`tokens;
@@ -252,16 +257,17 @@ extractPhrases:{[parsedTab;term]
 
 // @kind function
 // @category nlp
-// @fileoverview Given an input which is conceptually a single document,
+// @desc Given an input which is conceptually a single document,
 //   such as a book, this will give better results than TF-IDF.
 //   This algorithm is explained in the paper Carpena, P., et al.
 //   "Level statistics of words: Finding keywords in literary texts
 //    and symbolic sequences."
 //   Physical Review E 79.3 (2009): 035102.
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {dict} Where the keys are keywords as symbols, and the values are 
-//   their significance, as floats,with higher values being more significant
+// @returns {dictionary} Where the keys are keywords as symbols, and the values
+//   are their significance, as floats,with higher values being more 
+//   significant
 keywordsContinuous:{[parsedTab]
   text:raze parsedTab[`tokens]@'where each not parsedTab`isStop;
   groupTxt:group text;
@@ -281,11 +287,11 @@ keywordsContinuous:{[parsedTab]
 
 // @kind function
 // @category nlp
-// @fileoverview Find the TF-IDF scores for all terms in all documents
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Find the TF-IDF scores for all terms in all documents
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {dict[]} For each document, a dictionary with the tokens as keys,
-//   and relevance as values
+// @returns {dictionary[]} For each document, a dictionary with the tokens as 
+//   keys, and relevance as values
 TFIDF:{[parsedTab]
   nums:parsedTab[`tokens]like\:"[0-9]*";
   tokens:parsedTab[`tokens]@'where each not parsedTab[`isStop]|nums;
@@ -301,12 +307,13 @@ TFIDF:{[parsedTab]
 
 // @kind function
 // @category nlp
-// @fileoverview Find runs of tokens whose POS tags are in the set passed in
-// @param tagType {sym} `uniPOS or `pennPOS (Universal or Penn Part-of-Speech)
-// @param tags {sym;sym[]} One or more POS tags
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Find runs of tokens whose POS tags are in the set passed in
+// @param tagType {symbol} `uniPOS or `pennPOS (Universal or Penn 
+//   Part-of-Speech)
+// @param tags {symbol|symbol[]} One or more POS tags
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {(str;long)} Two item list containing
+// @returns {list} Two item list containing
 //   1. The text of the run as a symbol vector
 //   2. The index associated with the first token
 findPOSRuns:{[tagType;tags;parsedTab]
@@ -320,12 +327,12 @@ findPOSRuns:{[tagType;tags;parsedTab]
 
 // @kind function
 // @category nlp
-// @fileoverview Determine the probability of one word following another
+// @desc Determine the probability of one word following another
 //   in a sequence of words
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {dict} The probability that the secondary word in the sequence 
-//   follows the primary word.
+// @returns {dictionary} The probability that the secondary word in the 
+//   sequence follows the primary word.
 biGram:{[parsedTab]
   nums:parsedTab[`tokens]like\:"[0-9]*";
   tokens:raze parsedTab[`tokens]@'where each not parsedTab[`isStop]|nums;
@@ -335,12 +342,13 @@ biGram:{[parsedTab]
 
 // @kind function
 // @category nlp
-// @fileoverview Determine the probability of a `n` tokens appearing together
+// @desc Determine the probability of a `n` tokens appearing together
 //   in a text
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param n {long} The number of words to occur together
-// @returns {dict} The probability of `n` tokens appearing together in a text
+// @returns {dictionary} The probability of `n` tokens appearing together in 
+//   a text
 nGram:{[parsedTab;n]
   nums:parsedTab[`tokens]like\:"[0-9]*";
   tokens:raze parsedTab[`tokens]@'where each not parsedTab[`isStop]|nums;
@@ -356,9 +364,9 @@ nGram:{[parsedTab;n]
 
 // @kind function
 // @category nlp
-// @fileoverview Find Regular expressions within texts
-// @param text {str[]} The text of a document
-// @param expr {sym} The expression type to be searched for within the text
+// @desc Find Regular expressions within texts
+// @param text {string[]} The text of a document
+// @param expr {symbol} The expression type to be searched for within the text
 findRegex:{[text;expr]
   nExpr:$[1=count expr;enlist;];
   regexKeys:nExpr expr;
@@ -368,19 +376,19 @@ findRegex:{[text;expr]
 
 // @kind function
 // @category nlp
-// @fileoverview Remove any non-ascii characters from a text
-// @param text {str} A string of text
-// @returns {str} Non-ascii characters removed from the text
+// @desc Remove any non-ascii characters from a text
+// @param text {string} A string of text
+// @returns {string} Non-ascii characters removed from the text
 removeNonAscii:{[text]
   text where text within (0;127)
   }
 
 // @kind function
 // @category nlp
-// @fileoverview Remove certain characters from a string of text
-// @param text {str} A string of text
-// @param char {str[]} Characters or expressions to be removed from the text 
-// @returns {str} The text without anything that contains the defined 
+// @desc Remove certain characters from a string of text
+// @param text {string} A string of text
+// @param char {string[]} Characters or expressions to be removed from the text 
+// @returns {string} The text without anything that contains the defined 
 //   characters
 removeCustom:{[text;char]
   vecText:" " vs text;
@@ -389,10 +397,10 @@ removeCustom:{[text;char]
 
 // @kind function
 // @category nlp
-// @fileoverview Remove and replace certain characters from a string of text
-// @param text {str} A string of text
-// @param char {str[]} Characters or expressions to be removed from the text 
-// @param replace {str} The characters which will replace the removed
+// @desc Remove and replace certain characters from a string of text
+// @param text {string} A string of text
+// @param char {string[]} Characters or expressions to be removed from the text 
+// @param replace {string} The characters which will replace the removed
 //   characters
 removeReplace:{[text;char;replace]
   {x:ssr[x;y;z];x}[;;replace]/[text;char]
@@ -400,18 +408,18 @@ removeReplace:{[text;char;replace]
 
 // @kind function
 // @category nlp
-// @fileoverview Detect language from text
-// @param text {str} A string of text
-// @returns {sym} The language of the text
+// @desc Detect language from text
+// @param text {string} A string of text
+// @returns {symbol} The language of the text
 detectLang:{[text]
   `$.p.import[`langdetect][`:detect;<][text]
   }
 
 // @kind function
 // @category nlp
-// @fileoverview Import all files in a directory recursively
-// @param filepath {str} The directories file path
-// @returns {tab} Filenames, paths and texts contained within the filepath
+// @desc Import all files in a directory recursively
+// @param filepath {string} The directories file path
+// @returns {table} Filenames, paths and texts contained within the filepath
 loadTextFromDir:{[filepath]
   path:{raze$[-11=type k:key fp:hsym x;fp;.z.s each` sv'fp,'k]}`$filepath;
   ([]fileName:(` vs'path)[;1];path;text:"\n"sv'read0 each path)
@@ -419,10 +427,10 @@ loadTextFromDir:{[filepath]
 
 // @kind function
 // @category nlp
-// @fileOverview Get all the sentences for a document
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Get all the sentences for a document
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {str[]} All the sentences from a document
+// @returns {string[]} All the sentences from a document
 getSentences:{[parsedTab]
   (sublist[;parsedTab`text]deltas@)each parsedTab`sentChars
   }

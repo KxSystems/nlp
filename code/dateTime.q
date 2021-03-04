@@ -1,12 +1,17 @@
+// code/dateTime.q - Nlp time utilities
+// Copyright (c) 2021 Kx Systems Inc
+//
+// Utilities for handling dates and times
+
 \d .nlp
 
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Pads a string containing a single integer to two digits
+// @desc Pads a string containing a single integer to two digits
 //   or extracts the last 2 digits from a string
-// @param day {str} Contains a date
-// @returns {str} Padded date to two digits
+// @param day {string} Contains a date
+// @returns {string} Padded date to two digits
 tm.i.parseDay:{[day]
   -2#"0",day where day in .Q.n
   }
@@ -14,18 +19,18 @@ tm.i.parseDay:{[day]
 // @private
 // @kind data
 // @category nlpTimeUtility
-// @fileoverview Dictionary mapping the months of the year 
+// @desc Dictionary mapping the months of the year 
 //   to a symbol denoting integer representation
 tm.i.months:`jan`feb`mar`apr`may`jun`jul`aug`sep`oct`nov`dec!`$string 1+til 12
 
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Convert a long-form or short-form month string to 
+// @desc Convert a long-form or short-form month string to 
 //   a string denoting the month as an integer "feb"/"february"
 //   become "02"
-// @param day {str} A month of the year in English
-// @returns {str} A padded integer representing the month of the year
+// @param day {string} A month of the year in English
+// @returns {string} A padded integer representing the month of the year
 tm.i.parseMonth:{[month]
   -2#"0",string month^tm.i.months month:lower`$3 sublist month
   }
@@ -33,11 +38,11 @@ tm.i.parseMonth:{[month]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Pad a string denoting a year to 4 digits
+// @desc Pad a string denoting a year to 4 digits
 //   if input > 35 this is deemed to be 1900s 
 //   i.e. "20" -> "2020" / "44" -> "1944")
-// @param year {str} Contains a year
-// @returns {str} Padded year value
+// @param year {string} Contains a year
+// @returns {string} Padded year value
 tm.i.parseYear:{[year]
   -4#$[35<"I"$-2#year;"19";"20"],year
   }
@@ -45,10 +50,10 @@ tm.i.parseYear:{[year]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Convert year string to the entire date
+// @desc Convert year string to the entire date
 //   encapsulating that year
-// @param year {str} A year 
-// @returns {str} Date range from Jan 1 to Dec 31 of
+// @param year {string} A year 
+// @returns {string} Date range from Jan 1 to Dec 31 of
 //   the specified year
 tm.i.convY:{[year]
   "D"$year,/:(".01.01";".12.31")
@@ -57,12 +62,12 @@ tm.i.convY:{[year]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Convert string containing yearMonth
+// @desc Convert string containing yearMonth
 //   to the date range encapsulating that month
 //   i.e. "test 2020.02" -> 2020.02.01 2020.02.29
 //        "2019.02 test" -> 2019.02.01 2019.02.28
-// @param text {str} Text containing yearMonth value
-// @returns {str} Date range for the month of the
+// @param text {string} Text containing yearMonth value
+// @returns {string} Date range for the month of the
 //   provided yearMonth
 tm.i.convYearMonth:{[text]
   txt:regex.matchAll[;text]each regex.objects`year`month;
@@ -77,10 +82,10 @@ tm.i.convYearMonth:{[text]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Seperate YearMonth formats to year and month
+// @desc Seperate YearMonth formats to year and month
 //   i.e "ym" -> "y","m"
-// @params ym {str[]} The format for each date objecct
-// @returns {str} Formats of YearMonths objects seperated
+// @params ym {string[]} The format for each date objecct
+// @returns {string} Formats of YearMonths objects seperated
 tm.i.formatYM:{[ym]
   @[ym;where not counts;except[;raze ym where counts:1=count each ym]]
   }
@@ -88,12 +93,12 @@ tm.i.formatYM:{[ym]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// fileoverview Convert string containing yearMonthDay
+// @desc Convert string containing yearMonthDay
 //   to the date range encapsulating that day
 //   i.e. "test 2020.01.01" -> 2020.01.01 2020.01.01
 //        "2010.01.01 test" -> 2010.01.01 2010.01.01
-// @param text {str} Text containing yearMonthDay value 
-// @returns {str} Date range associated with the
+// @param text {string} Text containing yearMonthDay value 
+// @returns {string} Date range associated with the
 //   provided yearMonthDay
 tm.i.convYearMonthDay:{[text]
   txt:regex.matchAll[;text]each regex.objects`year`month`day;
@@ -108,10 +113,10 @@ tm.i.convYearMonthDay:{[text]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Seperate YearMonth formats to year and month
+// @desc Seperate YearMonth formats to year and month
 //   i.e "ymd" -> "y","m","d"
-// @params ymd {str[]} The format for each date objecct
-// @returns {str} Formats of YearMonthDays objects seperated
+// @params ymd {string[]} The format for each date objecct
+// @returns {string} Formats of YearMonthDays objects seperated
 tm.i.formatYMD:{[ymd]
   @[ymd;i unq;:;"ymd" unq:where 1=count each i:where each "ymd" in/:\:ymd]
   }
@@ -119,9 +124,10 @@ tm.i.formatYMD:{[ymd]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Fill in the blanks in a date format string
-// @param format {str} A date format, as some permutation of "d", "m", and "y"
-// @returns {str} The date format with any blanks filled with their most
+// @desc Fill in the blanks in a date format string
+// @param format {string} A date format, as some permutation of 
+//   "d", "m", and "y"
+// @returns {string} The date format with any blanks filled with their most
 //   plausible value
 tm.i.resolveFormat:{[format]
   $[0=n:sum" "=format;
@@ -137,7 +143,7 @@ tm.i.resolveFormat:{[format]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview The format to use, given a single known position
+// @desc The format to use, given a single known position
 tm.i.dateFormats:(!). flip(
   ("d  ";"dmy"); // 10th 02 99
   ("m  ";"mdy"); // Feb 10 99
@@ -152,10 +158,10 @@ tm.i.dateFormats:(!). flip(
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Turns a regex time string into a q timestamp
+// @desc Turns a regex time string into a q timestamp
 //   i.e "131030" -> 13:10:30.000
 //       "1pm"    -> 13:00:00.000
-// @param text {str} A time string
+// @param text {string} A time string
 // @returns {timestamp} The q time parsed from an
 //   appropriate string
 tm.i.parseTime:{[text]
@@ -168,9 +174,9 @@ tm.i.parseTime:{[text]
 // @private
 // @kind function
 // @category nlpTimeUtility
-// @fileoverview Remove any null values
-// @array {num[][]} Array of values
-// returns {num[][]} Array with nulls removed
+// @desc Remove any null values
+// @array {number[][]} Array of values
+// returns {number[][]} Array with nulls removed
 tm.i.rmNull:{[array]
   array where not null array[;0]
   }
