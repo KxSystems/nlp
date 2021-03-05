@@ -27,12 +27,14 @@ regex.i.check:{[patterns;text]
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of special characters
+// @type string
 regex.i.patterns.specialChars:"[-[\\]{}()*+?.,\\\\^$|#\\s]"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of special characters
+// @type string
 regex.i.patterns.money:"[$¥€£¤฿]?\\s*((?<![.0-9])([0-9][0-9, ]*(\\.",
   "([0-9]{0,2})?)?|\\.[0-9]{1,2})(?![.0-9]))\\s*((hundred|thousand|million",
   "|billion|trillion|[KMB])?\\s*([$¥€£¤฿]|dollars?|yen|pounds?|cad|usd|",
@@ -45,6 +47,7 @@ regex.i.patterns.money:"[$¥€£¤฿]?\\s*((?<![.0-9])([0-9][0-9, ]*(\\.",
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of phone number characters
+// @type string
 regex.i.patterns.phoneNumber:"\\b((\\+?\\s*\\(?[0-9]+\\)?[-. /]?)?\\(?[0-9]+",
   "\\)?[-. /]?)?[0-9]{3}[-. ][0-9]{4}(\\s*(x|ext\\s*.?|extension)[ .-]*[0-9]",
   "+)?\\b"
@@ -53,12 +56,14 @@ regex.i.patterns.phoneNumber:"\\b((\\+?\\s*\\(?[0-9]+\\)?[-. /]?)?\\(?[0-9]+",
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of email address characters
+// @type string
 regex.i.patterns.emailAddress:"\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of url characters
+// @type string
 regex.i.patterns.url:"((https?|ftps?)://(www\\d{0,3}\\.)?|www\\d{0,3}\\.)",
   "[^\\s()<>]+(?:\\([\\w\\d]+\\)|([^[:punct:]\\s]|/))"
 
@@ -66,36 +71,42 @@ regex.i.patterns.url:"((https?|ftps?)://(www\\d{0,3}\\.)?|www\\d{0,3}\\.)",
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of zipcode characters
+// @type string
 regex.i.patterns.zipCode:"\\b\\d{5}\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of postal code characters
+// @type string
 regex.i.patterns.postalCode:"\\b[a-z]\\d[a-z] ?\\d[a-z]\\d\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of postal or zip code characters
+// @type string
 regex.i.patterns.postalOrZipCode:"\\b(\\d{5}|[a-z]\\d[a-z] ?\\d[a-z]\\d)\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of date separator characters
+// @type string
 regex.i.patterns.dateSeparate:"[\\b(of |in )\\b\\t .,-/\\\\]+"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of date characters
+// @type string
 regex.i.patterns.day:"\\b[0-3]?[0-9](st|nd|rd|th)?\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of monthly characters
+// @type string
 regex.i.patterns.month:"\\b([01]?[0-9]|jan(uary)?|feb(ruary)?|mar(ch)?|",
   "apr(il)?|may|jun(e)?|jul(y)?|aug(ust)?|sep(tember)?|oct(ober)?|nov(ember)?",
   "|dec(ember)?)\\b"
@@ -104,30 +115,35 @@ regex.i.patterns.month:"\\b([01]?[0-9]|jan(uary)?|feb(ruary)?|mar(ch)?|",
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of yearly characters
+// @type string
 regex.i.patterns.year:"\\b([12][0-9])?[0-9]{2}\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of year characters in full
+// @type string
 regex.i.patterns.yearFull:"\\b[12][0-9]{3}\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of am characters
+// @type string
 regex.i.patterns.am:"(a[.\\s]?m\\.?)"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of pm characters
+// @type string
 regex.i.patterns.pm:"(p[.\\s]?m\\.?)"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of time (12hr) characters
+// @type string
 regex.i.patterns.time12:"\\b[012]?[0-9]:[0-5][0-9](h|(:[0-5][0-9])([.:][0-9]",
   "{1,9})?)?\\s*(",sv["|";regex.i.patterns`am`pm],")?\\b"
 
@@ -135,24 +151,28 @@ regex.i.patterns.time12:"\\b[012]?[0-9]:[0-5][0-9](h|(:[0-5][0-9])([.:][0-9]",
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of time (24hr) characters
+// @type string
 regex.i.patterns.time24:"\\b[012][0-9][0-5][0-9]h\\b"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of all time characters
+// @type string
 regex.i.patterns.time:"(",sv["|";regex.i.patterns`time12`time24],")"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of year/month characters as a list
+// @type string
 regex.i.patterns.yearMonthList:"(",sv["|";regex.i.patterns`year`month],")"
 
 // @private
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of year/month/date characters
+// @type string
 regex.i.patterns.yearMonthDayList:"(",sv["|";
   regex.i.patterns`year`month`day],")"
 
@@ -160,6 +180,7 @@ regex.i.patterns.yearMonthDayList:"(",sv["|";
 // @kind data
 // @category nlpRegexUtilityPattern
 // @desc A string of year/month characters along with date separators
+// @type string
 regex.i.patterns.yearMonth:"(",sv[regex.i.patterns.dateSeparate;
   2#enlist regex.i.patterns.yearMonthList],")"
 
@@ -168,6 +189,7 @@ regex.i.patterns.yearMonth:"(",sv[regex.i.patterns.dateSeparate;
 // @category nlpRegexUtilityPattern
 // @desc A string of year/month/date characters along with date
 //   separators
+// @type string
 regex.i.patterns.yearMonthDay:"(",sv[regex.i.patterns.dateSeparate;
   3#enlist regex.i.patterns.yearMonthDayList],")"
 

@@ -29,9 +29,10 @@ parser.i.cleanUTF8:{[data]
   }
 
 // @private
-// @kind data
+// @kind dictionary
 // @category nlpParserUtility
 // @desc Dependent options for input to spacy module
+// @type dictionary
 parser.i.depOpts:(!). flip(
   (`keywords;   `tokens`isStop);
   (`sentChars;  `sentIndices);
@@ -104,8 +105,8 @@ parser.i.newSubParser:{[modelName;options;disabled]
 // @param fieldNames {symbol[]} The field names the parser should return
 // @param options {symbol[]} The fields to compute
 // @param stopWords {symbol[]} The stopWords in the text
-// @param docs {string;string[]} The text being parsed
-// @returns {dictionary;table} The parsed document(s)
+// @param docs {string|string[]} The text being parsed
+// @returns {dictionary|table} The parsed document(s)
 parser.i.runParser:{[pyParser;fieldNames;options;stopWords;docs]
   tab:parser.i.cleanUTF8 each docs;
   parsed:parser.i.unpack[pyParser;options;stopWords]each tab;

@@ -65,6 +65,7 @@ sent.i.amplifyQM:{[text]
 // @kind data
 // @category nlpSentUtility
 // @desc Positive booster words. This increases positive valences
+// @type symbol[]
 sent.i.posBoosters:`$(
   "absolutely";"amazingly";"awfully";"completely";"considerably";"decidedly";
   "deeply";"effing";"enormously";"entirely";"especially";"exceptionally";
@@ -78,6 +79,7 @@ sent.i.posBoosters:`$(
 // @kind data
 // @category nlpSentUtility
 // @desc Negative booster words. This increase negative valences 
+// @type symbol[]
 sent.i.negBoosters:`$(
   "almost";"barely";"hardly";"just enough";"kind of";"kinda";"kindof";
   "kind-of";"less";"little";"marginally";"occasionally";"partly";"scarcely";
@@ -87,12 +89,14 @@ sent.i.negBoosters:`$(
 // @kind data
 // @category nlpSentUtility
 // @desc The co-efficient how much boosters increase sentiment
+// @type float
 sent.i.BOOSTER_INCR:.293
 
 // @private
 // @kind data
 // @category nlpSentUtility
 // @desc The co-efficient how much allcaps increase sentiment
+// @type float
 sent.i.ALLCAPS_INCR:.733
 
 // @private
@@ -100,6 +104,7 @@ sent.i.ALLCAPS_INCR:.733
 // @category nlpSentUtility
 // @desc A dictionary mapping all possible boosters
 //   to their associated values
+// @type dictionary
 sent.i.Boosters:(!). flip(sent.i.posBoosters,\:sent.i.BOOSTER_INCR),
   (sent.i.negBoosters,\:neg sent.i.BOOSTER_INCR)
 
@@ -144,6 +149,7 @@ sent.i.butCheck:{[tokens;valences]
 // @kind data
 // @category nlpSentUtility
 // @desc These are terms that negate what follows them
+// @type symbol[]
 sent.i.NEGATE:`$(
   "aint";"arent";"cannot";"cant";"couldnt";"darent";"didnt";"doesnt";
   "ain't";"aren't";"can't";"couldn't";"daren't";"didn't";"doesn't";
@@ -158,6 +164,7 @@ sent.i.NEGATE:`$(
 // @kind data
 // @category nlpSentUtility
 // @desc The co-efficient for sentiments following a negation
+// @type float
 sent.i.N_SCALAR:-0.74 
 
 // @private
@@ -190,12 +197,14 @@ sent.i.negationCheck:{[tokens;valences]
 //   Hutto, C.J. & Gilbert, E.E. (2014). VADER: A Parsimonious Rule-based Model
 //   for Sentiment Analysis of Social Media Text. Eighth International
 //   Conference on Weblogs and Social Media (ICWSM-14). Ann Arbor, MI,June 2014
+// @type dictionary
 sent.i.lexicon :(!).("SF";"\t")0: hsym `$.nlp.path,"/vader/lexicon.txt";
 
 // @private
 // @kind data
 // @category nlpSentUtility
 // @desc Additional lexicon sentiments
+// @type dictionary
 sent.i.lexicon,:(!). flip(
   (`$"the shit"; 3f);
   (`$"the bomb"; 3f);

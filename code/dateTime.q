@@ -17,9 +17,10 @@ tm.i.parseDay:{[day]
   }
 
 // @private
-// @kind data
+// @kind dictionary
 // @category nlpTimeUtility
 // @desc Dictionary mapping the months of the year 
+// @type dictionary
 //   to a symbol denoting integer representation
 tm.i.months:`jan`feb`mar`apr`may`jun`jul`aug`sep`oct`nov`dec!`$string 1+til 12
 
