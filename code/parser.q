@@ -43,9 +43,10 @@ parser.i.depOpts:(!). flip(
   (`isStop;     `lemmas))
 
 // @private
-// @kind data
+// @kind dictionary
 // @category nlpParserUtility
 // @desc Map from q-style attribute names to spacy
+// @type dictionary
 parser.i.q2spacy:(!). flip(
   (`likeEmail;  `like_email);
   (`likeNumber; `like_num);
@@ -58,9 +59,10 @@ parser.i.q2spacy:(!). flip(
   (`starts;     `idx))
 
 // @private
-// @kind data
+// @kind dictionary
 // @category nlpParserUtility
 // @desc Model inputs for spacy 'alpha' models
+// @type dictionary
 parser.i.alphaLang:(!). flip(
   (`ja;`Japanese);
   (`zh;`Chinese))

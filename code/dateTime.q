@@ -142,9 +142,10 @@ tm.i.resolveFormat:{[format]
   }
 
 // @private
-// @kind function
+// @kind dictionary
 // @category nlpTimeUtility
 // @desc The format to use, given a single known position
+// @type dictionary
 tm.i.dateFormats:(!). flip(
   ("d  ";"dmy"); // 10th 02 99
   ("m  ";"mdy"); // Feb 10 99
