@@ -199,7 +199,7 @@ regex.i.patterns.yearMonthDay:"(",sv[regex.i.patterns.dateSeparate;
 //   expression embedPy object which can be used for matching
 // @params patterns {string} A regex pattern
 // @params ignoreCase {boolean} Whether the case of the string is to be ignored
-// @returns {<} The compiled regex object
+// @return {<} The compiled regex object
 regex.compile:{[patterns;ignoreCase]
   case:$[ignoreCase;regex.i.re`:IGNORECASE;0];
   regex.i.re[`:compile;patterns;case]
@@ -219,4 +219,5 @@ regex.matchAll:.p.eval["lambda p,t:[[x.group(),x.start(),x.end()]",
 // @kind function
 // @category nlpRegex
 // @desc Compile all patterns into regular expression objects
+// @return {<} The compiled regex object
 regex.objects:regex.compile[;1b]each 1_regex.i.patterns

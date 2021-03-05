@@ -167,6 +167,7 @@ i.matrixFromRaggedList:{[raggedList]
 // @kind data
 // @category nlpUtility
 // @desc Parts-of-speech not useful as keywords
+// @type symbol[]
 i.stopUniPOS:asc`ADP`PART`AUX`CONJ`DET`SYM`NUM`PRON`SCONJ
 i.stopPennPOS:asc`CC`CD`DT`EX`IN`LS`MD`PDT`POS`PRP`SYM`TO`WDT`WP`WRB`,
   `$("PRP$";"WP$";"$")
