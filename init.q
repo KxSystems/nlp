@@ -1,3 +1,6 @@
+// init.q - Load nlp libraries
+// Copyright (c) 2021 Kx Systems Inc
+
 path:{string`nlp^`$@[{"/"sv -1_"/"vs ssr[;"\\";"/"](-3#get .z.s)0};`;""]}`
 system"l ",path,"/","nlp.q"
 

@@ -1,13 +1,18 @@
+// code/cluster.q - Nlp clustering utilities
+// Copyright (c) 2021 Kx Systems Inc
+// 
+// Clustering utilites for textual data 
+
 \d .nlp
 
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Extract the keywords from a list of documents or keyword
+// @desc Extract the keywords from a list of documents or keyword
 //   dictionary
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
-// @returns {dict[]} Keyword dictionaries
+// @returns {dictionary[]} Keyword dictionaries
 cluster.i.asKeywords:{[parsedTab]
   keyWords:$[-9=type parsedTab[0]`keywords;parsedTab;parsedTab`keywords];
   i.fillEmptyDocs keyWords
@@ -16,9 +21,9 @@ cluster.i.asKeywords:{[parsedTab]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Split the document into clusters using kmeans
+// @desc Split the document into clusters using kmeans
 // @param iters {long} The number of times to iterate the refining step
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param clusters {long} Cluster indices
 // @returns {long[][]} The documents' indices, grouped into clusters
@@ -31,8 +36,8 @@ cluster.i.bisect:{[iters;parsedTab;clusters]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Apply k-means clustering to a document
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Apply k-means clustering to a document
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param clusters {long[]} Cluster indices
 // @returns {long[][]} The documents' indices, grouped into clusters
@@ -44,9 +49,9 @@ cluster.i.kmeans:{[parsedTab;clusters]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Find nearest neighbor of document
-// @param centroids {dict[]} Centroids as keyword dictionaries
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Find nearest neighbor of document
+// @param centroids {dictionary[]} Centroids as keyword dictionaries
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @returns {long[][]} Document indices 
 cluster.i.findNearestNeighbor:{[centroids;doc]
@@ -58,7 +63,7 @@ cluster.i.findNearestNeighbor:{[centroids;doc]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Merge any clusters with significant overlap into a single 
+// @desc Merge any clusters with significant overlap into a single 
 //   cluster
 // @param clusters {any[][]} Cluster indices
 // @returns {any[][]} Appropriate clusters merged together
@@ -82,7 +87,7 @@ cluster.i.mergeOverlappingClusters:{[clusters]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Group together clusters that share over 50% of their elements
+// @desc Group together clusters that share over 50% of their elements
 // @param clusters {any[][]} Cluster indices
 // @param counts {long} Count of each cluster
 // @param idx {long} Index of cluster
@@ -97,7 +102,7 @@ cluster.i.similarClusters:{[clusters;counts;idx]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Normalize the columns of a matrix so they sum to 1
+// @desc Normalize the columns of a matrix so they sum to 1
 // @param matrix {float[][]} Numeric matrix of values 
 // @returns {float[][]} The normalized columns
 cluster.i.columnNormalize:{[matrix]
@@ -107,8 +112,8 @@ cluster.i.columnNormalize:{[matrix]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview Graph clustering that works on a similarity matrix
-// @param matrix {bool[][]} NxN adjacency matrix
+// @desc Graph clustering that works on a similarity matrix
+// @param matrix {boolean[][]} NxN adjacency matrix
 // @returns {long[][]} Lists of indices in the corpus where each row 
 //   is a cluster
 cluster.i.similarityMatrix:{[matrix]
@@ -125,7 +130,7 @@ cluster.i.similarityMatrix:{[matrix]
 // @private
 // @kind function
 // @category nlpClusteringUtility
-// @fileoverview SM Van Dongen's MCL clustering algorithm
+// @desc SM Van Dongen's MCL clustering algorithm
 // @param matrix {float[][]} NxN matrix
 // @return {float[][]} MCL algorithm applied to matrix
 cluster.i.MCL:{[matrix]
@@ -137,9 +142,9 @@ cluster.i.MCL:{[matrix]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Uses the top ten keywords of each document in order to cluster
+// @desc Uses the top ten keywords of each document in order to cluster
 //   similar documents together  
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param k {long} The number of clusters to return
 // @returns {long[][]} The documents' indices grouped into clusters
@@ -160,9 +165,9 @@ cluster.summarize:{[parsedTab;k]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Use the top 50 keywords of each document to calculate the 
+// @desc Use the top 50 keywords of each document to calculate the 
 //   cohesiveness as measured by the mean sum of sqaures
-// @param keywords {dict[]} A parsed document containing keywords and 
+// @param keywords {dictionary[]} A parsed document containing keywords and 
 //   their associated significance scores
 // @returns {float} The cohesion of the cluster
 cluster.MSE:{[parsedTab]
@@ -179,9 +184,9 @@ cluster.MSE:{[parsedTab]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview The bisecting k-means algorithm which uses k-means to 
+// @desc The bisecting k-means algorithm which uses k-means to 
 //   repeatedly split the most cohesive clusters into two clusters
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param k {long} The number of clusters to return
 // @param iters {long} The number of times to iterate the refining step
@@ -194,8 +199,8 @@ cluster.bisectingKMeans:{[parsedTab;k;iters]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview k-means clustering for documents
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc k-means clustering for documents
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param k {long} The number of clusters to return
 // @param iters {long} The number of times to iterate the refining step
@@ -208,10 +213,10 @@ cluster.kmeans:{[parsedTab;k;iters]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Given a list of centroids and a list of documents, match each
+// @desc Given a list of centroids and a list of documents, match each
 //   document to its nearest centroid
-// @param centroids {dict[]} Centroids as keyword dictionaries
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param centroids {dictionary[]} Centroids as keyword dictionaries
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @returns {long[][]} Lists of document indices where each list is a cluster
 //   N.B. These don't line up with the number of centroids passed in,
@@ -226,9 +231,9 @@ cluster.groupByCentroids:{[centroids;parsedTab]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Uses the Radix clustering algorithm and bins are taken from 
+// @desc Uses the Radix clustering algorithm and bins are taken from 
 //   the top 3 terms of each document
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param k {long} The number of clusters desired, though fewer may
 //   be returned. This must be fairly high to cover a substantial amount of the
@@ -256,9 +261,9 @@ cluster.radix:{[parsedTab;k]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Uses the Radix clustering algorithm and bins by the most 
+// @desc Uses the Radix clustering algorithm and bins by the most 
 //   significant term
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param k {long} The number of clusters desired, though fewer may
 //   be returned. This must be fairly high to cover a substantial amount of the
@@ -282,12 +287,12 @@ cluster.fastRadix:{[parsedTab;k]
 
 // @kind function
 // @category nlpClustering
-// @fileoverview Cluster a subcorpus using graph clustering
-// @param parsedTab {tab} A parsed document containing keywords and their
+// @desc Cluster a subcorpus using graph clustering
+// @param parsedTab {table} A parsed document containing keywords and their
 //   associated significance scores
 // @param minimum {float} The minimum similarity that will be considered
-// @param sample {bool} If this is true, a sample of sqrt(n) documents is used,
-//   otherwise all documanets are used
+// @param sample {boolean} If this is true, a sample of sqrt(n) documents is
+//   used, otherwise all documanets are used
 // @returns {long[][]} The documents' indices, grouped into clusters
 cluster.MCL:{[parsedTab;minimum;sample]
   docs:cluster.i.asKeywords parsedTab;
