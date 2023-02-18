@@ -142,7 +142,12 @@ If you have [Docker installed](https://www.docker.com/community-edition) you can
 
 ## User guide
 
-:open_file_folder: [`docs`](docs)
+-   [Data preparation](docs/preproc.md)
+-   [Text comparison](docs/comparisons.md)
+-   [Clustering](docs/clustering.md)
+-   [Feature vectors](docs/feature-vector.md)
+-   [Utilities](docs/utils.md)
+-   [Emails](docs/emails.md)
 
  
 
