@@ -1,7 +1,5 @@
 # Natural Language Processing
 
-## Introduction
-
 Natural language processing (NLP) can be used to answer a variety of questions about unstructured text, as well as facilitating open-ended exploration. It can be applied to datasets such as emails, online articles and comments, tweets and novels. Although the source is text, transformations are applied to convert this data to vectors, dictionaries and symbols which can be handled very effectively by q. Many operations such as searching, clustering, and keyword extraction can all be done using very simple data structures, such as feature vectors.
 
 ## Features
@@ -9,25 +7,27 @@ Natural language processing (NLP) can be used to answer a variety of questions a
 The NLP allows users to parse dataset using the spacy model from python in which it runs tokenisation, Sentence Detection, Part of speech tagging and Lemmatization. In addition to parsing, users can cluster text documents together using different clustering algorithms like MCL, K-means and radix. You can also run sentiment analysis which indicates whether a word has a positive or negative sentiment.
 
 ## Requirements
-- kdb+>=? v3.5 64-bit
+- kdb+ ≥? v3.5 64-bit
 - Anaconda Python 3.x
 - [embedPy](https://github.com/KxSystems/embedPy)
 
-#### Dependencies
-The following python packages are required:
-  1. numpy
-  2. beautifulsoup4
-  3. spacy 
+### Dependencies
 
-* Tests were run using spacy version 2.2.1
+The following Python packages are required:
+
+  1. `numpy`
+  2. `beautifulsoup4`
+  3. `spacy` 
+
+> Tests were run using `spacy` version 2.2.1
 
 To install these packages with
 
-pip
+Pip
 ```bash
 pip install -r requirements.txt
 ```
-or with conda
+or with Conda
 ```bash
 conda install -c conda-forge --file requirements.txt
 ```
@@ -52,15 +52,15 @@ pip
 pip install mecab-python3
 ```
 
-* spacy_hunspell is not a requirement to run these scripts, but can be installed using the following methods
+> `spacy_hunspell` is not a requirement to run these scripts, but can be installed as follows:
 
-Linux
+Linux:
 ```bash
 sudo apt-get install libhunspell-dev hunspell
 pip install spacy_hunspell
 ```
 
-mac
+macOS:
 ```bash
 wget https://iweb.dl.sourceforge.net/project/wordlist/speller/2019.10.06/hunspell-en_US-2019.10.06.zip;
 unzip hunspell-en_US-2019.10.06; sudo mv en_US.dic en_US.aff /Library/Spelling/; 
@@ -71,16 +71,18 @@ sudo ln -sf /usr/local/Cellar/hunspell/1.7.0_2/lib/libhunspell-1.7.dylib /usr/lo
 CFLAGS=$(pkg-config --cflags hunspell) LDFLAGS=$(pkg-config --libs hunspell) pip install hunspell==0.5.0
 ```
 
-At the moment spacy_hunspell does not support installation for windows. More information can be found at https://github.com/tokestermw/spacy_hunspell
+At the moment `spacy_hunspell` does not support installation for Windows. 
+More information can be found at https://github.com/tokestermw/spacy_hunspell
 
 ## Installation
+
 Run tests with
 
 ```bash
 q test.q
 ```
 
-Place the library file in `$QHOME` and load into a q instance using 
+Place the library file in `$QHOME` and load into a q instance:
 
 ```q
 q)\l nlp/nlp.q
@@ -130,20 +132,22 @@ If you have [Docker installed](https://www.docker.com/community-edition) you can
     09:00:00.000 "9:00am" 18 24
     10:20:00.000 "10:20"  45 50
     
+:point_right:
+[Instructions regarding headless/presets](https://github.com/KxSystems/embedPy/docker/README.md#headlesspresets)
 
-**N.B.** [instructions regarding headless/presets are available](https://github.com/KxSystems/embedPy/docker/README.md#headlesspresets)
-
-**N.B.** [build instructions for the image are available](docker/README.md)
-
+:point_right:
+[Build instructions for the image](docker/README.md)
 
 
-## Documentation
 
-Documentation is available on the [nlp](https://code.kx.com/v2/ml/nlp/) homepage.
+## User guide
+
+:open_file_folder: [`docs`](docs)
 
  
 
 ## Status
   
-The nlp library is still in development and is available here as a beta release.  
+The NLP library is still in development, and is available here as a beta release.  
 If you have any issues, questions or suggestions, please write to ai@kx.com.
+
