@@ -1,20 +1,13 @@
----
-author: Fionnuala Carr
-date: August 2018
-keywords: algorithm, analysis, bisecting, centroid, cluster, clustering, comparison, corpora, parsedTab, document, email, feature, file, k-mean, kdbplus, learning, machine, machine learning, mbox, message, ml, nlp, parse, parsing, q, sentiment, similarity, string function, vector
----
+# Data preparation
 
-# :fontawesome-solid-share-alt: Data preparation
+`.nlp`   **Data preparation**
 
-<div markdown="1" class="typewriter">
-.nlp   **Data preparation**
-\  Preparing text
-  [newParser](#nlpnewparser)    Creates a parser
-  [parseURLs](#nlpparseurls)    Parse URLs into dictionaries containing their constituent components
+Preparing text<br>
+[`newParser`](#nlpnewparser)    Creates a parser<br>
+[`parseURLs`](#nlpparseurls)    Parse URLs into dictionaries containing their constituent components
 
-\  Finding part-of-speech tags in a corpus
-  [findPOSRuns](#nlpfindposruns)   Find tokens of specific POS types in a text
-</div>
+Finding part-of-speech tags in a corpus<br>
+[`findPOSRuns`](#nlpfindposruns)   Find tokens of specific POS types in a text
 
 
 ## Preparing text
@@ -32,13 +25,12 @@ Lemmatization           | Converts to a base form e.g. `ran` (verb) to `run` (ve
 
 The text of `Moby Dick` was used in the examples.
 
-:fontawesome-brands-github:
+
 [KxSystems/mlnotebooks/data/mobydick.txt](https://github.com/KxSystems/mlnotebooks/blob/master/data/mobydick.txt)
 <br>
-:fontawesome-brands-github:
 [KxSystems/mlnotebooks/notebooks/08 Natural Language Processing.ipynb](https://github.com/KxSystems/mlnotebooks/blob/master/notebooks/08%20Natural%20Language%20Processing.ipynb)
 
-```txt
+```q
 // Read in data
 text:"\n"sv read0`:mobydick.txt
 removeBadNewlines:{@[x;1+(raze string x="\n")ss"010";:;" "]}
@@ -61,7 +53,7 @@ This is a quick way to find all of the nouns, adverbs, etc. in a corpus. There a
 
 _Find tokens of specific POS types in a text_
 
-```syntax
+```txt
 .nlp.findPOSRuns[tagtype;tags;parsedDict]
 ```
 
@@ -92,14 +84,14 @@ q).nlp.findPOSRuns[`pennPOS;`NNP`NNPS;parsedDict]
 `mole             ,247
 ```
 
-!!! note "The `parsedDict` argument must contain keys: `tokens` and `pennPOS` or `uniPOS`"
+> The `parsedDict` argument must contain keys: `tokens` and `pennPOS` or `uniPOS`
 
 
 ## `.nlp.newParser`
 
 _Create a parser_
 
-```syntax
+```txt
 .nlp.newParser[spacyModel;fields]
 ```
 
@@ -145,12 +137,11 @@ q)cols parsedTab
 `text`tokens`lemmas`pennPOS`isStop`sentChars`starts`sentIndices`keywords
 ```
 
-??? tip "Chinese and Japanese language support"
+:bulb: Chinese and Japanese language support
 
-	`.nlp.newParser` also supports Chinese (`zh`) and Japanese (`ja`) tokenization. These languages are only in the alpha stage of development within SpaCy so all functionality may not be available. 
+`.nlp.newParser` also supports Chinese (`zh`) and Japanese (`ja`) tokenization. These languages are only in the alpha stage of development within SpaCy so all functionality may not be available. 
 
-    :fontawesome-brands-github:
-    [KxSystems/nlp](https://github.com/KxSystems/nlp) for installation instructions
+See [installation instructions](../README.md#installation)
 
 
 
@@ -158,7 +149,7 @@ q)cols parsedTab
 
 _Parse URLs into dictionaries containing their constituent components_
 
-```syntax
+```txt
 .nlp.parseURLs url
 ```
 

@@ -1,32 +1,25 @@
----
-author: Fionnuala Carr
-date: August 2018
-keywords: algorithm, analysis, bisecting, centroid, cluster, clustering, comparison, corpora, corpus, document, email, feature, file, k-mean, kdbplus, learning, machine, machine learning, mbox, message, ml, nlp, parse, parsing, q, sentiment, similarity, string function, vector
----
+# Feature vectors
 
-# :fontawesome-solid-share-alt: Feature vectors
-<div markdown="1" class="typewriter">
-.nlp   **Feature vector functions**
-\  Feature vectors for documents
-  [keywordsContinuous](#nlpkeywordscontinuous) Relevance scores for tokens in a text
-  [TFIDF](#nlptfidf)              TF-IDF scores for terms in each document of a corpus
+`.nlp`   **Feature vector functions**
 
-\  Feature vectors for words
-  [biGram](#nlpbigram)             Probability of a word appearing next in a sequence
-  [extractPhrases](#nlpextractphrases)     Tokens that contain the term where each consecutive word
-                     has an above-average co-occurrence
-  [findRelatedTerms](#nlpfindrelatedterms)    Find related terms and their significance to a word
-  [nGram](#nlpngram)              Probability of n tokens appearing together
-</div>
+Feature vectors for documents<br>
+[`keywordsContinuous`](#nlpkeywordscontinuous) Relevance scores for tokens in a text<br>
+[`TFIDF`](#nlptfidf)              TF-IDF scores for terms in each document of a corpus
+
+Feature vectors for words<br>
+[`biGram`](#nlpbigram)             Probability of a word appearing next in a sequence<br>
+[`extractPhrases`](#nlpextractphrases)     Tokens that contain the term where each consecutive word has an above-average co-occurrence<br>
+[`findRelatedTerms`](#nlpfindrelatedterms)    Find related terms and their significance to a word<br>
+[`nGram`](#nlpngram)              Probability of n tokens appearing together
 
 
 After applying [data-processing procedures](preproc.md), you can treat pieces of text as feature vectors.
 
 You can generate a dictionary of descriptive terms, which consist of terms and their associated weights. These dictionaries are called _feature vectors_ and they are very useful as they give a uniform representation that can describe words, sentences, paragraphs, documents, collections of documents, clusters, concepts and queries.
 
-!!! tip "`parsedTab`"
-
-    In the examples below, the `parsedTab` variable is the result from the `.nlp.newParser` [example](#preproc/nlpnewparser) in the data-preprocessing section.  
+> `parsedTab`
+> 
+> In the examples below, the `parsedTab` variable is the result from the `.nlp.newParser` [example](preproc.md#nlpnewparser) in the data-preprocessing section.  
 
 
 ## Feature vectors for documents
@@ -49,7 +42,7 @@ The feature vector for a word can be calculated as a collection of how well othe
 
 _Probability of a word appearing next in a sequence of words_
 
-```syntax
+```txt
 .nlp.biGram parsedTab
 ```
 
@@ -70,14 +63,14 @@ money       purse      | 0.07692308
 purse       particular | 0.1428571
 ```
 
-!!! note "The `parsedTab` argument must contain column/s `tokens` and `isStop`"
+> The `parsedTab` argument must contain column/s `tokens` and `isStop`
 
 
 ## `.nlp.extractPhrases`
 
 _Tokens that contain the term where each consecutive word has an above-average co-occurrence with the term_
 
-```syntax
+```txt
 .nlp.extractPhrases[parsedTab;term]
 ```
 
@@ -101,14 +94,14 @@ q).nlp.extractPhrases[parsedTab;`captain]
 ...
 ```
 
-!!! note "The `parsedTab` argument must contain column `tokens`"
+> The `parsedTab` argument must contain column `tokens`
 
 
 ## `.nlp.findRelatedTerms`
 
 _Related terms and their significance to a word_
 
-```syntax
+```txt
 .nlp.findRelatedTerms[parsedTab;term]
 ```
 
@@ -130,14 +123,14 @@ cabin   | 0.9816231
 
 Phrases can be found by looking for runs of words with an above-average significance to the query term.
 
-!!! note "The `parsedTab` argument must contain columns `tokens`, `isStop`, and `sentIndices`"
+> The `parsedTab` argument must contain columns `tokens`, `isStop`, and `sentIndices`
 
 
 ## `.nlp.keywordsContinuous`
 
 _Relevance scores for tokens in a text_
 
-```syntax
+```txt
 .nlp.keywordsContinuous parsedTab
 ```
 
@@ -156,14 +149,14 @@ stubb     | 37.82133
 
 For an input which is conceptually a single document, such as a book, this will give better results than using TF-IDF.
 
-!!! note "The `parsedTab` argument must contain columns `tokens` and `isStop`"
+> The `parsedTab` argument must contain columns `tokens` and `isStop`
 
 
 ## `.nlp.nGram`
 
 _Probability of `n` tokens appearing together in a text_
 
-```syntax
+```txt
 .nlp.nGram[parsedTab;n]
 ```
 
@@ -188,14 +181,14 @@ years    ago      scoresby   | 0.05882353
 years    ago      commodore  | 0.05882353
 ```
 
-!!! note "The `parsedTab` argument must contain columns `tokens` and `isStop`"
+> The `parsedTab` argument must contain columns `tokens` and `isStop`
 
 
 ## `.nlp.TFIDF`
 
 _TF-IDF scores for terms in each document of a corpus_
 
-```syntax
+```txt
 .nlp.TFIDF parsedTab
 ```
 
@@ -212,6 +205,6 @@ java   | 0.01729666
 sunda  | 0.01675828
 ```
 
-!!! note "The `parsedTab` argument must contain columns `tokens` and `isStop`"
+> The `parsedTab` argument must contain columns `tokens` and `isStop`
 
 

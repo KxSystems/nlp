@@ -1,38 +1,28 @@
----
-author: Fionnuala Carr
-date: August 2018
-keywords: algorithm, analysis, bisecting, centroid, cluster, clustering, comparison, corpora, corpus, document, email, feature, file, k-mean, kdbplus, learning, machine, machine learning, mbox, message, ml, nlp, parse, parsing, q, sentiment, similarity, string function, vector
----
+# Utility functions
 
-# :fontawesome-solid-share-alt: Utility functions
-
-
-<div markdown="1" class="typewriter">
-.nlp   **Utility functions**
-  [detectLang](#nlpdetectlang)      Detect the language within a text
-  [findDates](#nlpfinddates)        Find all the dates in a string
-  [findRegex](#nlpfindregex)        Find regular expressions within a string
-  [findTimes](#nlpfindtimes)        Find all the times in a string
-  [getSentences](#nlpgetsentences)    Extract all sentences for a document
-  [loadTextFromDir](#nlploadtextfromdir) Import all files in a director
-  [removeCustom](#nlpremovecustom)    Remove aspects of a string containing certain characters
-                  or expressions
-  [removeNonAscii](#nlpremovenonascii)  Remove non-ASCII characters from a string
-  [removeReplace](#nlpremovereplace)   Replace individual characters in a string
-  [sentiment](#nlpsentiment)       Calculate the sentiment of a sentence
-</div>
+`.nlp`   **Utility functions**<br>
+[`detectLang`](#nlpdetectlang)      Detect the language within a text<br>
+[`findDates`](#nlpfinddates)        Find all the dates in a string<br>
+[`findRegex`](#nlpfindregex)        Find regular expressions within a string<br>
+[`findTimes`](#nlpfindtimes)        Find all the times in a string<br>
+[`getSentences`](#nlpgetsentences)    Extract all sentences for a document<br>
+[`loadTextFromDir`](#nlploadtextfromdir) Import all files in a director<br>
+[`removeCustom`](#nlpremovecustom)    Remove aspects of a string containing certain characters or expressions<br>
+[`removeNonAscii`](#nlpremovenonascii)  Remove non-ASCII characters from a string<br>
+[`removeReplace`](#nlpremovereplace)   Replace individual characters in a string<br>
+[`sentiment`](#nlpsentiment)       Calculate the sentiment of a sentence
 
 
 The NLP library contains functions useful for in-depth document analysis. They extract elements of the text that can be applied to NLP algorithms, or that can help you with your analysis.
 
-In the below examples, the `parsedTab`/`parsedDict` variable is the output from the `.nlp.newParser` [example](#preproc/nlpnewparser) defined in the data-preprocessing section.
+In the below examples, the `parsedTab`/`parsedDict` variable is the output from the `.nlp.newParser` [example](preproc.md#nlpnewparser) defined in the data-preprocessing section.
 
 
 ## `.nlp.detectLang`
 
 _Language of a text_
 
-```syntax
+```txt
 .nlp.detectLang text
 ```
 
@@ -47,7 +37,7 @@ q).nlp.detectLang "Ein, zwei, drei, vier"
 
 This function uses Python’s [`langdetect`](#https://pypi.org/project/langdetect/) module. 
 
-:fontawesome-brands-wikipedia-w:
+:globe_with_meridians:
 [Language codes](#https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
 
 
@@ -55,7 +45,7 @@ This function uses Python’s [`langdetect`](#https://pypi.org/project/langdetec
 
 _Find dates in a string_
 
-```syntax
+```txt
 .nlp.findDates text
 ```
 
@@ -78,7 +68,7 @@ q).nlp.findDates "I am going on holidays on the 12/04/2018 to New York and come 
 
 _Find regular expressions within a string_
 
-```syntax
+```txt
 .nlp.findRegex[text;expr]
 ```
 
@@ -120,7 +110,7 @@ money        | ,("\302\24330.00";128;134)
 
 _Find times in a string_
 
-```syntax
+```txt
 .nlp.findTimes text
 ```
 
@@ -142,7 +132,7 @@ q).nlp.findTimes "I went to work at 9:00am and had a coffee at 10:20"
 
 _Extract sentences from a document_
 
-```syntax
+```txt
 .nlp.getSentences parsedDict
 ```
 
@@ -166,7 +156,7 @@ q).nlp.getSentences parsedDict
 
 _Import all files in a directory_
 
-```syntax
+```txt
 .nlp.loadTextFromDir filepath
 ```
 
@@ -188,7 +178,7 @@ fileName path                                           text                 ..
 
 _Remove characters from a string_
 
-```syntax
+```txt
 .nlp.removeCustom[text;char]
 ```
 
@@ -214,7 +204,7 @@ q).nlp.removeCustom[(jeffemails`text)100;rmvList]
 
 _Remove non-ASCII characters from a string_
 
-```syntax
+```txt
 .nlp.removeNonAscii[text]
 ```
 
@@ -230,7 +220,7 @@ q).nlp.removeNonAscii["This is ä senteñcê"]
 
 _Remove and replace characters from a string_
 
-```syntax
+```txt
 .nlp.removeReplace[text;char;replace]
 ```
 
@@ -252,7 +242,7 @@ q).nlp.removeReplace[(jeffemails`text)100;",.:?!/@'\n";"??"]
 
 _Sentiment of a sentence_
 
-```syntax 
+```txt 
 .nlp.sentiment text
 ```
 

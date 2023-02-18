@@ -1,17 +1,9 @@
----
-author: Fionnuala Carr
-date: August 2018
-keywords: algorithm, analysis, bisecting, centroid, cluster, clustering, comparison, corpora, corpus, document, email, feature, file, k-mean, kdbplus, learning, machine, machine learning, mbox, message, ml, nlp, parse, parsing, q, sentiment, similarity, string function, vector
----
+# Emails
 
-# :fontawesome-solid-share-alt: Emails
-
-<div markdown="1" class="typewriter">
-.nlp.email   **Emails**
-  [getGraph](#nlpemailgetgraph)    Get the graph of who emailed who
-  [loadEmails](#nlpemailloademails)  Convert an mbox file to a table of parsed metadata
-  [parseMail](#nlpemailparsemail)   Extract meta information from an email
-</div>
+`.nlp.email`   **Emails**<br>
+[`getGraph`](#nlpemailgetgraph)    Get the graph of who emailed who<br>
+[`loadEmails`](#nlpemailloademails)  Convert an mbox file to a table of parsed metadata<br>
+[`parseMail`](#nlpemailparsemail)   Extract meta information from an email
 
 One of the most important document formats for analysis in natural-language processing is emails, particularly for surveillance, and spam detection. The following functions form a basis for the handling of email-format data.
 
@@ -23,7 +15,7 @@ The MBOX file is the most common format for storing email messages on a hard dri
 
 _Get the graph of who emailed who, including the number of times they emailed_
 
-```syntax
+```txt
 .nlp.email.getGraph emails
 ```
 
@@ -53,7 +45,7 @@ ram@cs.umb.edu                   tdwg-img@lists.tdwg.org          2
 
 _Convert an MBOX file to a table of parsed metadata_
 
-```syntax
+```txt
 .nlp.email.loadEmails filepath
 ```
 
@@ -82,7 +74,7 @@ q)cols email
 
 _Extract meta information from an email_
 
-```syntax
+```txt
 .nlp.email.parseMail filepath
 ```
 

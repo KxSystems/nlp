@@ -1,32 +1,24 @@
----
-author: Fionnuala Carr
-date: August 2018
-keywords: algorithm, analysis, bisecting, centroid, cluster, clustering, comparison, corpora, corpus, document, email, feature, file, k-mean, kdbplus, learning, machine, machine learning, mbox, message, ml, nlp, parse, parsing, q, sentiment, similarity, string function, vector
----
+# Text comparison
 
-# :fontawesome-solid-share-alt: Text comparison
-
-<div markdown="1" class="typewriter">
-.nlp   **Comparison functions**
-  [compareCorpora](#nlpcomparecorpora)       Compare corpora
-  [compareDocs](#nlpcomparedocs)          Compare two documents
-  [compareDocToCentroid](#nlpcomparedoctocentroid) Find outliers and representative documents
-  [compareDocToCorpus](#nlpcomparedoctocorpus)   Compare document to corpus
-  [cosineSimilarity](#nlpcosinesimilarity)     Compare two feature vectors
-  [explainSimilarity](#nlpexplainsimilarity)    How much each term contributes to cosine similarity
-  [jaroWinkler](#nlpjarowinkler)          Compare two strings
-</div>
+`.nlp`   **Comparison functions**<br>
+[`compareCorpora`](#nlpcomparecorpora)       Compare corpora<br>
+[`compareDocs`](#nlpcomparedocs)          Compare two documents<br>
+[`compareDocToCentroid`](#nlpcomparedoctocentroid) Find outliers and representative documents<br>
+[`compareDocToCorpus`](#nlpcomparedoctocorpus)   Compare document to corpus<br>
+[`cosineSimilarity`](#nlpcosinesimilarity)     Compare two feature vectors<br>
+[`explainSimilarity`](#nlpexplainsimilarity)    How much each term contributes to cosine similarity<br>
+[`jaroWinkler`](#nlpjarowinkler)          Compare two strings
 
 Following the application of [data-processing procedures](preproc.md), it is possible to compare feature vectors, corpora and documents.
 
-In the examples below, the `parsedTab` variable is the output from the `.nlp.newParser` [example](#preproc/nlpnewparser) defined in the data-preprocessing section.
+In the examples below, the `parsedTab` variable is the output from the `.nlp.newParser` [example](preproc.md#nlpnewparser) defined in the data-preprocessing section.
 
 
 ## `.nlp.compareCorpora`
 
 _Affinity between terms in two corpora_
 
-```syntax
+```txt
 .nlp.compareCorpora[parsedTab1;parsedTab2]
 ```
 
@@ -60,7 +52,7 @@ aye     | 13.4208
 
 A quick way to compare corpora is to find words common to the whole dataset, but with a strong affinity to only one corpus. This can be used to find key words which differentiate one corpus from another
 
-!!! note "The `parsedTab` argument must contain columns `tokens` and `isStop`"
+> The `parsedTab` argument must contain columns `tokens` and `isStop`
 
 This function allows you to calculate the similarity of two different documents. It finds the keywords that are present in both the corporas, and calculates the cosine similarity.
 
@@ -69,7 +61,7 @@ This function allows you to calculate the similarity of two different documents.
 
 _Cosine similarity of two documents_
 
-```syntax
+```txt
 .nlp.compareDocs[keywords1;keywords2]
 ```
 
@@ -99,7 +91,7 @@ q).nlp.compareDocs[keywords1;keywords2]
 
 _Find outliers and representative documents_
 
-```syntax
+```txt
 .nlp.compareDocToCentroid[centroid;keywords]
 ```
 
@@ -135,7 +127,7 @@ text                                                              ..
 
 _Cosine similarity between a document and other documents in a corpus_
 
-```syntax
+```txt
 .nlp.compareDocToCorpus[keywords;idx]
 ```
 
@@ -158,7 +150,7 @@ q).nlp.compareDocToCorpus[parsedTab`keywords;0]
 
 _Compare two feature vectors_
 
-```syntax
+```txt
 .nlp.cosineSimilarity[keywords1;keywords2]
 ```
 
@@ -202,7 +194,7 @@ The _cosine similarity_ of two vectors is the dot product of two vectors over th
 
 _How much each term contributes to the cosine similarity_
 
-```syntax
+```txt
 .nlp.explainSimilarity[keywords1;keywords2]
 ```
 
@@ -224,7 +216,7 @@ For any pair of documents or centroids, the list of features can be sorted by ho
 
 _Calculate the Jaro-Winkler distance of two strings, scored between 0 and 1_
 
-```syntax
+```txt
 .nlp.jaroWinkler[str1;str2]
 ```
 
