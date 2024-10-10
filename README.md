@@ -2,7 +2,7 @@
 
 ---
 
-Since 9th October 2024 (version 4.0.0), this project has been merged into the ml toolkit mono-repo. For the latest updates and active development, please visit [https://github.com/KxSystems/ml](https://github.com/KxSystems/ml). 
+Since 9th October 2024 (the 4.0.0 release of the ML Toolkit), this project has been merged into the ml toolkit mono-repo. For the latest updates and active development, please visit [https://github.com/KxSystems/ml](https://github.com/KxSystems/ml). 
 
 This repository is preserved only to maintain old links and project history but will no longer be actively maintained.
 
